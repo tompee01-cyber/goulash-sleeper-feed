@@ -1,0 +1,191 @@
+name: Update Sleeper League Feed
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 5 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Sleeper league feed
+        env:
+          LEAGUE_ID: "1382401291862437888"
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+          from datetime import datetime, timezone
+
+          LEAGUE_ID = os.environ["LEAGUE_ID"]
+          BASE = "https://api.sleeper.app/v1"
+
+          def get(path):
+              req = urllib.request.Request(
+                  BASE + path,
+                  headers={"User-Agent": "goulash-sleeper-feed/1.0"}
+              )
+              with urllib.request.urlopen(req, timeout=90) as response:
+                  return json.load(response)
+
+          def player_info(pid, p):
+              return {
+                  "player_id": str(pid),
+                  "full_name": p.get("full_name"),
+                  "first_name": p.get("first_name"),
+                  "last_name": p.get("last_name"),
+                  "team": p.get("team"),
+                  "position": p.get("position"),
+                  "fantasy_positions": p.get("fantasy_positions"),
+                  "status": p.get("status"),
+                  "active": p.get("active"),
+                  "injury_status": p.get("injury_status"),
+                  "age": p.get("age"),
+                  "years_exp": p.get("years_exp"),
+                  "depth_chart_position": p.get("depth_chart_position"),
+                  "depth_chart_order": p.get("depth_chart_order")
+              }
+
+          nfl_state = get("/state/nfl")
+          current_week = int(nfl_state.get("week") or 1)
+
+          league = get(f"/league/{LEAGUE_ID}")
+          users = get(f"/league/{LEAGUE_ID}/users")
+          rosters = get(f"/league/{LEAGUE_ID}/rosters")
+          matchups = get(f"/league/{LEAGUE_ID}/matchups/{current_week}")
+          traded_picks = get(f"/league/{LEAGUE_ID}/traded_picks")
+
+          transactions = {}
+          for week in range(1, current_week + 1):
+              transactions[str(week)] = get(
+                  f"/league/{LEAGUE_ID}/transactions/{week}"
+              )
+
+          trending_add = get(
+              "/players/nfl/trending/add?lookback_hours=48&limit=100"
+          )
+          trending_drop = get(
+              "/players/nfl/trending/drop?lookback_hours=48&limit=100"
+          )
+
+          all_players = get("/players/nfl")
+
+          rostered = set()
+
+          for roster in rosters:
+              for field in ("players", "reserve", "taxi"):
+                  for pid in roster.get(field) or []:
+                      rostered.add(str(pid))
+
+          allowed_positions = {
+              "QB", "RB", "WR", "TE", "K",
+              "DL", "LB", "DB"
+          }
+
+          free_agents = {}
+
+          for pid, player in all_players.items():
+              pid = str(pid)
+
+              if pid in rostered:
+                  continue
+
+              fantasy_positions = set(
+                  player.get("fantasy_positions") or []
+              )
+
+              primary_position = player.get("position")
+
+              relevant = (
+                  fantasy_positions.intersection(allowed_positions)
+                  or primary_position in allowed_positions
+              )
+
+              if not relevant:
+                  continue
+
+              if not player.get("active") and not player.get("team"):
+                  continue
+
+              free_agents[pid] = player_info(pid, player)
+
+          referenced_ids = set(rostered)
+          referenced_ids.update(free_agents.keys())
+
+          for item in trending_add + trending_drop:
+              if item.get("player_id"):
+                  referenced_ids.add(str(item["player_id"]))
+
+          for week_transactions in transactions.values():
+              for transaction in week_transactions:
+                  referenced_ids.update(
+                      str(x) for x in (transaction.get("adds") or {}).keys()
+                  )
+                  referenced_ids.update(
+                      str(x) for x in (transaction.get("drops") or {}).keys()
+                  )
+
+          players = {}
+
+          for pid in referenced_ids:
+              player = all_players.get(pid)
+              if player:
+                  players[pid] = player_info(pid, player)
+
+          output = {
+              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "league_id": LEAGUE_ID,
+              "current_week": current_week,
+              "nfl_state": nfl_state,
+              "league": league,
+              "users": users,
+              "rosters": rosters,
+              "matchups": matchups,
+              "transactions": transactions,
+              "traded_picks": traded_picks,
+              "trending": {
+                  "add_48h": trending_add,
+                  "drop_48h": trending_drop
+              },
+              "rostered_player_ids": sorted(rostered),
+              "free_agents": free_agents,
+              "players": players
+          }
+
+          with open("league.json", "w", encoding="utf-8") as f:
+              json.dump(
+                  output,
+                  f,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+          print(
+              f"Week {current_week}: "
+              f"{len(rostered)} rostered players, "
+              f"{len(free_agents)} free agents."
+          )
+          PY
+
+      - name: Commit updated feed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add league.json
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update Sleeper league feed"
+            git push
+          fi
