@@ -114,10 +114,10 @@ jobs:
                   continue
 
               if not player.get("active"):
-              continue
+                  continue
 
               if not player.get("team"):
-              continue
+                  continue
 
               free_agents[pid] = player_info(pid, player)
 
