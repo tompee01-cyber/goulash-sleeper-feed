@@ -24,18 +24,64 @@ jobs:
           import json
           import os
           import urllib.request
-          from datetime import datetime, timezone
+          from datetime import datetime, timezone, timedelta, time
+          from zoneinfo import ZoneInfo
 
           LEAGUE_ID = os.environ["LEAGUE_ID"]
           BASE = "https://api.sleeper.app/v1"
+          SCHEDULE_BASE = "https://api.sleeper.app/schedule/nfl"
+          PACIFIC = ZoneInfo("America/Los_Angeles")
 
-          def get(path):
+          def get_url(url):
               req = urllib.request.Request(
-                  BASE + path,
-                  headers={"User-Agent": "goulash-sleeper-feed/2.0"}
+                  url,
+                  headers={"User-Agent": "goulash-sleeper-feed/2.1"}
               )
               with urllib.request.urlopen(req, timeout=90) as response:
                   return json.load(response)
+
+          def get(path):
+              return get_url(BASE + path)
+
+          def iso(dt):
+              return dt.astimezone(timezone.utc).isoformat() if dt else None
+
+          def parse_dt(value):
+              if value is None:
+                  return None
+
+              if isinstance(value, (int, float)):
+                  ts = float(value)
+                  if ts > 1e12:
+                      ts /= 1000.0
+                  return datetime.fromtimestamp(ts, tz=timezone.utc)
+
+              text = str(value).strip()
+              if not text:
+                  return None
+
+              if text.isdigit():
+                  ts = float(text)
+                  if ts > 1e12:
+                      ts /= 1000.0
+                  return datetime.fromtimestamp(ts, tz=timezone.utc)
+
+              # A date without a kickoff time is not precise enough
+              # to determine when Sleeper locks a player.
+              if len(text) == 10 and text[4] == "-" and text[7] == "-":
+                  return None
+
+              try:
+                  dt = datetime.fromisoformat(
+                      text.replace("Z", "+00:00")
+                  )
+              except ValueError:
+                  return None
+
+              if dt.tzinfo is None:
+                  dt = dt.replace(tzinfo=timezone.utc)
+
+              return dt.astimezone(timezone.utc)
 
           def player_info(pid, p):
               return {
@@ -55,9 +101,36 @@ jobs:
                   "depth_chart_order": p.get("depth_chart_order")
               }
 
+          def after_game_clear_at(game_start_utc, waiver_day_of_week):
+              local_game = game_start_utc.astimezone(PACIFIC)
+
+              # Sleeper uses Sunday=0, Monday=1, ... Saturday=6.
+              sleeper_game_day = (local_game.weekday() + 1) % 7
+
+              days_until_after_day = (
+                  int(waiver_day_of_week) - sleeper_game_day
+              ) % 7
+
+              after_day = (
+                  local_game.date()
+                  + timedelta(days=days_until_after_day)
+              )
+
+              # Sleeper support describes "Tue After" as clearing
+              # at approximately 12:05 a.m. Pacific on Wednesday.
+              clear_local = datetime.combine(
+                  after_day + timedelta(days=1),
+                  time(0, 5),
+                  tzinfo=PACIFIC
+              )
+
+              return clear_local.astimezone(timezone.utc)
+
           # ---------------------------------------------------------
           # NFL / league state
           # ---------------------------------------------------------
+
+          now_utc = datetime.now(timezone.utc)
 
           nfl_state = get("/state/nfl")
           current_week = int(nfl_state.get("week") or 1)
@@ -75,7 +148,7 @@ jobs:
           )
 
           # ---------------------------------------------------------
-          # Transactions: every week from Week 1 through current week
+          # Transactions: Week 1 through current week
           # ---------------------------------------------------------
 
           transactions = {}
@@ -86,7 +159,7 @@ jobs:
               )
 
           # ---------------------------------------------------------
-          # Sleeper trending data - RAW, no scoring
+          # Sleeper trending data — RAW
           # ---------------------------------------------------------
 
           trending_add = get(
@@ -100,13 +173,50 @@ jobs:
           )
 
           # ---------------------------------------------------------
+          # NFL schedule for current season
+          #
+          # Used only to determine Sleeper's after-game waiver lock.
+          # ---------------------------------------------------------
+
+          season = str(league.get("season") or nfl_state.get("season"))
+
+          schedule_ok = True
+          nfl_schedule = []
+
+          try:
+              nfl_schedule = get_url(
+                  f"{SCHEDULE_BASE}/regular/{season}"
+              )
+          except Exception as exc:
+              schedule_ok = False
+              print(f"WARNING: NFL schedule fetch failed: {exc}")
+
+          current_week_schedule = [
+              game
+              for game in nfl_schedule
+              if int(game.get("week") or 0) == current_week
+          ]
+
+          team_game_start = {}
+
+          for game in current_week_schedule:
+              game_start = parse_dt(game.get("date"))
+
+              if not game_start:
+                  continue
+
+              for team in (game.get("home"), game.get("away")):
+                  if team:
+                      team_game_start[str(team)] = game_start
+
+          # ---------------------------------------------------------
           # Sleeper master NFL player database
           # ---------------------------------------------------------
 
           all_players = get("/players/nfl")
 
           # ---------------------------------------------------------
-          # Determine every player currently rostered in the league
+          # Determine all rostered players
           # ---------------------------------------------------------
 
           rostered_player_ids = set()
@@ -117,15 +227,228 @@ jobs:
                       rostered_player_ids.add(str(pid))
 
           # ---------------------------------------------------------
+          # Transaction event index for after-drop waiver calculation
+          # ---------------------------------------------------------
+
+          player_events = {}
+
+          for week_transactions in transactions.values():
+              for transaction in week_transactions:
+
+                  if transaction.get("status") != "complete":
+                      continue
+
+                  event_dt = parse_dt(
+                      transaction.get("created")
+                      or transaction.get("status_updated")
+                  )
+
+                  if not event_dt:
+                      continue
+
+                  tx_type = transaction.get("type")
+
+                  for pid, roster_id in (
+                      transaction.get("adds") or {}
+                  ).items():
+                      player_events.setdefault(str(pid), []).append({
+                          "kind": "add",
+                          "dt": event_dt,
+                          "roster_id": str(roster_id),
+                          "tx_type": tx_type,
+                          "transaction_id": str(
+                              transaction.get("transaction_id") or ""
+                          )
+                      })
+
+                  for pid, roster_id in (
+                      transaction.get("drops") or {}
+                  ).items():
+                      player_events.setdefault(str(pid), []).append({
+                          "kind": "drop",
+                          "dt": event_dt,
+                          "roster_id": str(roster_id),
+                          "tx_type": tx_type,
+                          "transaction_id": str(
+                              transaction.get("transaction_id") or ""
+                          )
+                      })
+
+          for events in player_events.values():
+              events.sort(key=lambda e: e["dt"])
+
+          # ---------------------------------------------------------
+          # League waiver settings
+          # ---------------------------------------------------------
+
+          league_settings = league.get("settings") or {}
+
+          waiver_clear_days = int(
+              league_settings.get("waiver_clear_days") or 0
+          )
+
+          waiver_day_of_week = league_settings.get(
+              "waiver_day_of_week"
+          )
+
+          # ---------------------------------------------------------
+          # Availability helper
+          #
+          # Handles:
+          # - after-drop waiver duration
+          # - Sleeper 24-hour free-agent rule
+          # - after-game waiver locks
+          #
+          # If the schedule endpoint is unavailable, a player with no
+          # active after-drop waiver is marked Unknown rather than
+          # falsely labelled immediately addable.
+          # ---------------------------------------------------------
+
+          def availability_for(pid, player):
+              events = player_events.get(str(pid), [])
+
+              drops = [
+                  e for e in events
+                  if e["kind"] == "drop"
+              ]
+
+              last_drop = drops[-1] if drops else None
+              prior_add = None
+
+              if last_drop:
+                  prior_adds = [
+                      e for e in events
+                      if (
+                          e["kind"] == "add"
+                          and e["dt"] < last_drop["dt"]
+                          and e["roster_id"] == last_drop["roster_id"]
+                      )
+                  ]
+
+                  if prior_adds:
+                      prior_add = prior_adds[-1]
+
+              reasons = []
+              clear_candidates = []
+              drop_clear_at = None
+
+              # After-drop waivers.
+              if last_drop and waiver_clear_days > 0:
+                  after_drop_applies = True
+
+                  # Sleeper 24-hour rule:
+                  # a player added via immediate free agency and held
+                  # less than 24 hours goes directly back to free agency
+                  # when dropped.
+                  if (
+                      prior_add
+                      and prior_add["tx_type"] == "free_agent"
+                  ):
+                      held_for = (
+                          last_drop["dt"] - prior_add["dt"]
+                      )
+
+                      if (
+                          timedelta(0)
+                          <= held_for
+                          < timedelta(hours=24)
+                      ):
+                          after_drop_applies = False
+
+                  if after_drop_applies:
+                      drop_clear_at = (
+                          last_drop["dt"]
+                          + timedelta(days=waiver_clear_days)
+                      )
+
+                      if now_utc < drop_clear_at:
+                          reasons.append("After Drop Waivers")
+                          clear_candidates.append(drop_clear_at)
+
+              # After-game waivers.
+              team = player.get("team")
+              game_start = (
+                  team_game_start.get(str(team))
+                  if team
+                  else None
+              )
+
+              if (
+                  schedule_ok
+                  and game_start
+                  and waiver_day_of_week is not None
+              ):
+                  game_clear_at = after_game_clear_at(
+                      game_start,
+                      waiver_day_of_week
+                  )
+
+                  game_lock_now = (
+                      game_start <= now_utc < game_clear_at
+                  )
+
+                  # A current after-drop waiver can be pushed later if
+                  # the player's game begins before the drop waiver
+                  # would otherwise clear.
+                  game_pushes_drop = (
+                      drop_clear_at is not None
+                      and now_utc < drop_clear_at
+                      and game_start <= drop_clear_at
+                      and now_utc < game_clear_at
+                  )
+
+                  if game_lock_now or game_pushes_drop:
+                      reasons.append("After Game Waivers")
+                      clear_candidates.append(game_clear_at)
+
+              if clear_candidates:
+                  clear_at = max(clear_candidates)
+
+                  return {
+                      "availability_status": "Waivers",
+                      "availability_icon": "W",
+                      "availability_reason": " + ".join(reasons),
+                      "waiver_clears_at": iso(clear_at),
+                      "last_drop_at": (
+                          iso(last_drop["dt"])
+                          if last_drop
+                          else None
+                      ),
+                      "game_start_at": iso(game_start)
+                  }
+
+              if not schedule_ok:
+                  return {
+                      "availability_status": "Unknown",
+                      "availability_icon": "?",
+                      "availability_reason": (
+                          "NFL schedule unavailable; "
+                          "game-waiver state not verified"
+                      ),
+                      "waiver_clears_at": None,
+                      "last_drop_at": (
+                          iso(last_drop["dt"])
+                          if last_drop
+                          else None
+                      ),
+                      "game_start_at": None
+                  }
+
+              return {
+                  "availability_status": "Free Agent",
+                  "availability_icon": "+",
+                  "availability_reason": None,
+                  "waiver_clears_at": None,
+                  "last_drop_at": (
+                      iso(last_drop["dt"])
+                      if last_drop
+                      else None
+                  ),
+                  "game_start_at": iso(game_start)
+              }
+
+          # ---------------------------------------------------------
           # Build RAW waiver / free-agent pool
-          #
-          # Rules:
-          # - player is NOT rostered by any league team
-          # - Sleeper marks player active
-          # - player has a fantasy-relevant league position
-          #
-          # No dynasty/weekly/value filtering is performed.
-          # Unsigned but active players are retained.
           # ---------------------------------------------------------
 
           allowed_positions = {
@@ -171,9 +494,12 @@ jobs:
               if not relevant:
                   continue
 
-              waiver_pool.append(
-                  player_info(pid, player)
+              record = player_info(pid, player)
+              record.update(
+                  availability_for(pid, player)
               )
+
+              waiver_pool.append(record)
 
           waiver_pool.sort(
               key=lambda p: (
@@ -183,13 +509,7 @@ jobs:
           )
 
           # ---------------------------------------------------------
-          # Create compact player metadata index
-          #
-          # Includes:
-          # - rostered players
-          # - waiver-pool players
-          # - trending players
-          # - players referenced by transactions
+          # Compact player metadata index
           # ---------------------------------------------------------
 
           referenced_ids = set(rostered_player_ids)
@@ -226,17 +546,29 @@ jobs:
                       player
                   )
 
+          availability_counts = {
+              "Free Agent": sum(
+                  1 for p in waiver_pool
+                  if p["availability_status"] == "Free Agent"
+              ),
+              "Waivers": sum(
+                  1 for p in waiver_pool
+                  if p["availability_status"] == "Waivers"
+              ),
+              "Unknown": sum(
+                  1 for p in waiver_pool
+                  if p["availability_status"] == "Unknown"
+              )
+          }
+
           # ---------------------------------------------------------
           # RAW OUTPUT
-          #
-          # No recommendation, ranking, score or analysis.
           # ---------------------------------------------------------
 
           output = {
-              "schema_version": "GK_RAW_V1",
-              "generated_at": datetime.now(
-                  timezone.utc
-              ).isoformat(),
+              "schema_version": "GK_RAW_V2",
+              "availability_calc_version": "GK_AVAIL_V1",
+              "generated_at": iso(now_utc),
               "league_id": LEAGUE_ID,
               "current_week": current_week,
 
@@ -258,6 +590,20 @@ jobs:
                   "drop": trending_drop
               },
 
+              "nfl_schedule_current_week": current_week_schedule,
+              "availability_schedule_ok": schedule_ok,
+
+              "waiver_rules": {
+                  "waiver_clear_days": waiver_clear_days,
+                  "waiver_day_of_week": waiver_day_of_week,
+                  "daily_waivers": league_settings.get(
+                      "daily_waivers"
+                  ),
+                  "daily_waivers_hour": league_settings.get(
+                      "daily_waivers_hour"
+                  )
+              },
+
               "rostered_player_count": len(
                   rostered_player_ids
               ),
@@ -269,6 +615,8 @@ jobs:
               "waiver_pool_count": len(
                   waiver_pool
               ),
+
+              "availability_counts": availability_counts,
 
               "waiver_pool": waiver_pool,
 
@@ -288,10 +636,14 @@ jobs:
               )
 
           print(
-              f"Schema: GK_RAW_V1 | "
+              f"Schema: GK_RAW_V2 | "
+              f"Availability: GK_AVAIL_V1 | "
               f"Week: {current_week} | "
               f"Rostered: {len(rostered_player_ids)} | "
               f"Waiver pool: {len(waiver_pool)} | "
+              f"Free Agent (+): {availability_counts['Free Agent']} | "
+              f"Waivers (W): {availability_counts['Waivers']} | "
+              f"Unknown (?): {availability_counts['Unknown']} | "
               f"Trending adds: {len(trending_add)} | "
               f"Trending drops: {len(trending_drop)}"
           )
@@ -308,6 +660,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Update Sleeper raw feed"
+            git commit -m "Update Sleeper raw feed GK_RAW_V2"
             git push
           fi
