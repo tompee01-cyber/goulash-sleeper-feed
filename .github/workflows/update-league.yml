@@ -150,6 +150,9 @@ jobs:
               if not player.get("active"):
                   continue
 
+              if not player.get("team"):
+                  continue
+
               fantasy_positions = set(
                   player.get("fantasy_positions") or []
               )
