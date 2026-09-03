@@ -113,8 +113,11 @@ jobs:
               if not relevant:
                   continue
 
-              if not player.get("active") and not player.get("team"):
-                  continue
+              if not player.get("active"):
+              continue
+
+              if not player.get("team"):
+              continue
 
               free_agents[pid] = player_info(pid, player)
 
