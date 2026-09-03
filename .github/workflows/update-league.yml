@@ -3,7 +3,7 @@ name: Update Sleeper League Feed
 on:
   workflow_dispatch:
   schedule:
-    - cron: "15 5 * * *"
+    - cron: "15 */3 * * *"
 
 permissions:
   contents: write
@@ -32,7 +32,7 @@ jobs:
           def get(path):
               req = urllib.request.Request(
                   BASE + path,
-                  headers={"User-Agent": "goulash-sleeper-feed/1.0"}
+                  headers={"User-Agent": "goulash-sleeper-feed/1.1"}
               )
               with urllib.request.urlopen(req, timeout=90) as response:
                   return json.load(response)
@@ -54,6 +54,12 @@ jobs:
                   "depth_chart_position": p.get("depth_chart_position"),
                   "depth_chart_order": p.get("depth_chart_order")
               }
+
+          def numeric(value, default=999):
+              try:
+                  return int(value)
+              except (TypeError, ValueError):
+                  return default
 
           nfl_state = get("/state/nfl")
           current_week = int(nfl_state.get("week") or 1)
@@ -77,6 +83,18 @@ jobs:
               "/players/nfl/trending/drop?lookback_hours=48&limit=100"
           )
 
+          trend_add_counts = {
+              str(item["player_id"]): int(item.get("count") or 0)
+              for item in trending_add
+              if item.get("player_id")
+          }
+
+          trend_drop_counts = {
+              str(item["player_id"]): int(item.get("count") or 0)
+              for item in trending_drop
+              if item.get("player_id")
+          }
+
           all_players = get("/players/nfl")
 
           rostered = set()
@@ -90,6 +108,9 @@ jobs:
               "QB", "RB", "WR", "TE", "K",
               "DL", "LB", "DB"
           }
+
+          offense_positions = {"QB", "RB", "WR", "TE"}
+          idp_positions = {"DL", "LB", "DB"}
 
           free_agents = {}
 
@@ -120,6 +141,106 @@ jobs:
                   continue
 
               free_agents[pid] = player_info(pid, player)
+
+          candidate_records = []
+
+          for pid, player in free_agents.items():
+              positions = set(player.get("fantasy_positions") or [])
+              if player.get("position"):
+                  positions.add(player["position"])
+
+              depth = numeric(player.get("depth_chart_order"))
+              years = numeric(player.get("years_exp"))
+              add_count = trend_add_counts.get(pid, 0)
+              drop_count = trend_drop_counts.get(pid, 0)
+
+              score = 0
+              reasons = []
+
+              if add_count > 0:
+                  score += 100 + min(add_count, 50)
+                  reasons.append(f"Sleeper trending add ({add_count})")
+
+              if drop_count > 0:
+                  score += 20 + min(drop_count, 20)
+                  reasons.append(f"Sleeper trending drop ({drop_count})")
+
+              if positions.intersection(offense_positions):
+                  if depth <= 2:
+                      score += 50
+                      reasons.append(f"offense depth-chart order {depth}")
+                  elif depth == 3:
+                      score += 30
+                      reasons.append("offense depth-chart order 3")
+                  elif depth == 4:
+                      score += 10
+                      reasons.append("offense depth-chart order 4")
+
+              if positions.intersection(idp_positions):
+                  if depth <= 2:
+                      score += 40
+                      reasons.append(f"IDP depth-chart order {depth}")
+                  elif depth == 3:
+                      score += 20
+                      reasons.append("IDP depth-chart order 3")
+
+              if "K" in positions:
+                  score += 30
+                  reasons.append("active NFL kicker")
+
+              if years <= 1:
+                  score += 30
+                  reasons.append("rookie/second-year dynasty profile")
+              elif years <= 3:
+                  score += 15
+                  reasons.append("young dynasty profile")
+
+              is_candidate = (
+                  add_count > 0
+                  or drop_count > 0
+                  or (
+                      positions.intersection(offense_positions)
+                      and depth <= 4
+                  )
+                  or (
+                      positions.intersection(idp_positions)
+                      and depth <= 3
+                  )
+                  or "K" in positions
+                  or (years <= 1 and depth <= 5)
+              )
+
+              if not is_candidate:
+                  continue
+
+              record = dict(player)
+              record["candidate_score"] = score
+              record["candidate_reasons"] = reasons
+              record["trending_add_48h"] = add_count
+              record["trending_drop_48h"] = drop_count
+
+              candidate_records.append(record)
+
+          candidate_records.sort(
+              key=lambda p: (
+                  -p["candidate_score"],
+                  numeric(p.get("years_exp")),
+                  numeric(p.get("depth_chart_order")),
+                  p.get("full_name") or ""
+              )
+          )
+
+          top_candidates = candidate_records[:250]
+
+          selected_ids = {
+              p["player_id"] for p in top_candidates
+          }
+
+          for player in candidate_records[250:]:
+              pid = player["player_id"]
+              if trend_add_counts.get(pid, 0) > 0 and pid not in selected_ids:
+                  top_candidates.append(player)
+                  selected_ids.add(pid)
 
           referenced_ids = set(rostered)
           referenced_ids.update(free_agents.keys())
@@ -161,6 +282,8 @@ jobs:
               },
               "rostered_player_ids": sorted(rostered),
               "free_agents": free_agents,
+              "waiver_candidate_count": len(top_candidates),
+              "waiver_candidates": top_candidates,
               "players": players
           }
 
@@ -175,7 +298,8 @@ jobs:
           print(
               f"Week {current_week}: "
               f"{len(rostered)} rostered players, "
-              f"{len(free_agents)} free agents."
+              f"{len(free_agents)} free agents, "
+              f"{len(top_candidates)} waiver candidates."
           )
           PY
 
