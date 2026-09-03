@@ -1,4 +1,4 @@
-name: Update Sleeper League Feed
+name: Update Sleeper Raw Feed
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build Sleeper league feed
+      - name: Build Sleeper raw feed
         env:
           LEAGUE_ID: "1382401291862437888"
         run: |
@@ -32,7 +32,7 @@ jobs:
           def get(path):
               req = urllib.request.Request(
                   BASE + path,
-                  headers={"User-Agent": "goulash-sleeper-feed/1.1"}
+                  headers={"User-Agent": "goulash-sleeper-feed/2.0"}
               )
               with urllib.request.urlopen(req, timeout=90) as response:
                   return json.load(response)
@@ -55,11 +55,9 @@ jobs:
                   "depth_chart_order": p.get("depth_chart_order")
               }
 
-          def numeric(value, default=999):
-              try:
-                  return int(value)
-              except (TypeError, ValueError):
-                  return default
+          # ---------------------------------------------------------
+          # NFL / league state
+          # ---------------------------------------------------------
 
           nfl_state = get("/state/nfl")
           current_week = int(nfl_state.get("week") or 1)
@@ -67,57 +65,89 @@ jobs:
           league = get(f"/league/{LEAGUE_ID}")
           users = get(f"/league/{LEAGUE_ID}/users")
           rosters = get(f"/league/{LEAGUE_ID}/rosters")
-          matchups = get(f"/league/{LEAGUE_ID}/matchups/{current_week}")
-          traded_picks = get(f"/league/{LEAGUE_ID}/traded_picks")
+
+          matchups = get(
+              f"/league/{LEAGUE_ID}/matchups/{current_week}"
+          )
+
+          traded_picks = get(
+              f"/league/{LEAGUE_ID}/traded_picks"
+          )
+
+          # ---------------------------------------------------------
+          # Transactions: every week from Week 1 through current week
+          # ---------------------------------------------------------
 
           transactions = {}
+
           for week in range(1, current_week + 1):
               transactions[str(week)] = get(
                   f"/league/{LEAGUE_ID}/transactions/{week}"
               )
 
+          # ---------------------------------------------------------
+          # Sleeper trending data - RAW, no scoring
+          # ---------------------------------------------------------
+
           trending_add = get(
-              "/players/nfl/trending/add?lookback_hours=48&limit=100"
+              "/players/nfl/trending/add"
+              "?lookback_hours=48&limit=100"
           )
+
           trending_drop = get(
-              "/players/nfl/trending/drop?lookback_hours=48&limit=100"
+              "/players/nfl/trending/drop"
+              "?lookback_hours=48&limit=100"
           )
 
-          trend_add_counts = {
-              str(item["player_id"]): int(item.get("count") or 0)
-              for item in trending_add
-              if item.get("player_id")
-          }
-
-          trend_drop_counts = {
-              str(item["player_id"]): int(item.get("count") or 0)
-              for item in trending_drop
-              if item.get("player_id")
-          }
+          # ---------------------------------------------------------
+          # Sleeper master NFL player database
+          # ---------------------------------------------------------
 
           all_players = get("/players/nfl")
 
-          rostered = set()
+          # ---------------------------------------------------------
+          # Determine every player currently rostered in the league
+          # ---------------------------------------------------------
+
+          rostered_player_ids = set()
 
           for roster in rosters:
               for field in ("players", "reserve", "taxi"):
                   for pid in roster.get(field) or []:
-                      rostered.add(str(pid))
+                      rostered_player_ids.add(str(pid))
+
+          # ---------------------------------------------------------
+          # Build RAW waiver / free-agent pool
+          #
+          # Rules:
+          # - player is NOT rostered by any league team
+          # - Sleeper marks player active
+          # - player has a fantasy-relevant league position
+          #
+          # No dynasty/weekly/value filtering is performed.
+          # Unsigned but active players are retained.
+          # ---------------------------------------------------------
 
           allowed_positions = {
-              "QB", "RB", "WR", "TE", "K",
-              "DL", "LB", "DB"
+              "QB",
+              "RB",
+              "WR",
+              "TE",
+              "K",
+              "DL",
+              "LB",
+              "DB"
           }
 
-          offense_positions = {"QB", "RB", "WR", "TE"}
-          idp_positions = {"DL", "LB", "DB"}
-
-          free_agents = {}
+          waiver_pool = []
 
           for pid, player in all_players.items():
               pid = str(pid)
 
-              if pid in rostered:
+              if pid in rostered_player_ids:
+                  continue
+
+              if not player.get("active"):
                   continue
 
               fantasy_positions = set(
@@ -127,167 +157,126 @@ jobs:
               primary_position = player.get("position")
 
               relevant = (
-                  fantasy_positions.intersection(allowed_positions)
+                  bool(
+                      fantasy_positions.intersection(
+                          allowed_positions
+                      )
+                  )
                   or primary_position in allowed_positions
               )
 
               if not relevant:
                   continue
 
-              if not player.get("active"):
-                  continue
-
-              if not player.get("team"):
-                  continue
-
-              free_agents[pid] = player_info(pid, player)
-
-          candidate_records = []
-
-          for pid, player in free_agents.items():
-              positions = set(player.get("fantasy_positions") or [])
-              if player.get("position"):
-                  positions.add(player["position"])
-
-              depth = numeric(player.get("depth_chart_order"))
-              years = numeric(player.get("years_exp"))
-              add_count = trend_add_counts.get(pid, 0)
-              drop_count = trend_drop_counts.get(pid, 0)
-
-              score = 0
-              reasons = []
-
-              if add_count > 0:
-                  score += 100 + min(add_count, 50)
-                  reasons.append(f"Sleeper trending add ({add_count})")
-
-              if drop_count > 0:
-                  score += 20 + min(drop_count, 20)
-                  reasons.append(f"Sleeper trending drop ({drop_count})")
-
-              if positions.intersection(offense_positions):
-                  if depth <= 2:
-                      score += 50
-                      reasons.append(f"offense depth-chart order {depth}")
-                  elif depth == 3:
-                      score += 30
-                      reasons.append("offense depth-chart order 3")
-                  elif depth == 4:
-                      score += 10
-                      reasons.append("offense depth-chart order 4")
-
-              if positions.intersection(idp_positions):
-                  if depth <= 2:
-                      score += 40
-                      reasons.append(f"IDP depth-chart order {depth}")
-                  elif depth == 3:
-                      score += 20
-                      reasons.append("IDP depth-chart order 3")
-
-              if "K" in positions:
-                  score += 30
-                  reasons.append("active NFL kicker")
-
-              if years <= 1:
-                  score += 30
-                  reasons.append("rookie/second-year dynasty profile")
-              elif years <= 3:
-                  score += 15
-                  reasons.append("young dynasty profile")
-
-              is_candidate = (
-                  add_count > 0
-                  or drop_count > 0
-                  or (
-                      positions.intersection(offense_positions)
-                      and depth <= 4
-                  )
-                  or (
-                      positions.intersection(idp_positions)
-                      and depth <= 3
-                  )
-                  or "K" in positions
-                  or (years <= 1 and depth <= 5)
+              waiver_pool.append(
+                  player_info(pid, player)
               )
 
-              if not is_candidate:
-                  continue
-
-              record = dict(player)
-              record["candidate_score"] = score
-              record["candidate_reasons"] = reasons
-              record["trending_add_48h"] = add_count
-              record["trending_drop_48h"] = drop_count
-
-              candidate_records.append(record)
-
-          candidate_records.sort(
+          waiver_pool.sort(
               key=lambda p: (
-                  -p["candidate_score"],
-                  numeric(p.get("years_exp")),
-                  numeric(p.get("depth_chart_order")),
+                  p.get("position") or "",
                   p.get("full_name") or ""
               )
           )
 
-          top_candidates = candidate_records[:250]
+          # ---------------------------------------------------------
+          # Create compact player metadata index
+          #
+          # Includes:
+          # - rostered players
+          # - waiver-pool players
+          # - trending players
+          # - players referenced by transactions
+          # ---------------------------------------------------------
 
-          selected_ids = {
-              p["player_id"] for p in top_candidates
-          }
+          referenced_ids = set(rostered_player_ids)
 
-          for player in candidate_records[250:]:
-              pid = player["player_id"]
-              if trend_add_counts.get(pid, 0) > 0 and pid not in selected_ids:
-                  top_candidates.append(player)
-                  selected_ids.add(pid)
-
-          referenced_ids = set(rostered)
-          referenced_ids.update(free_agents.keys())
+          for player in waiver_pool:
+              referenced_ids.add(player["player_id"])
 
           for item in trending_add + trending_drop:
-              if item.get("player_id"):
-                  referenced_ids.add(str(item["player_id"]))
+              pid = item.get("player_id")
+              if pid:
+                  referenced_ids.add(str(pid))
 
           for week_transactions in transactions.values():
               for transaction in week_transactions:
-                  referenced_ids.update(
-                      str(x) for x in (transaction.get("adds") or {}).keys()
-                  )
-                  referenced_ids.update(
-                      str(x) for x in (transaction.get("drops") or {}).keys()
-                  )
+
+                  for pid in (
+                      transaction.get("adds") or {}
+                  ).keys():
+                      referenced_ids.add(str(pid))
+
+                  for pid in (
+                      transaction.get("drops") or {}
+                  ).keys():
+                      referenced_ids.add(str(pid))
 
           players = {}
 
           for pid in referenced_ids:
               player = all_players.get(pid)
+
               if player:
-                  players[pid] = player_info(pid, player)
+                  players[pid] = player_info(
+                      pid,
+                      player
+                  )
+
+          # ---------------------------------------------------------
+          # RAW OUTPUT
+          #
+          # No recommendation, ranking, score or analysis.
+          # ---------------------------------------------------------
 
           output = {
-              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "schema_version": "GK_RAW_V1",
+              "generated_at": datetime.now(
+                  timezone.utc
+              ).isoformat(),
               "league_id": LEAGUE_ID,
               "current_week": current_week,
+
               "nfl_state": nfl_state,
               "league": league,
+
               "users": users,
               "rosters": rosters,
+
               "matchups": matchups,
+
               "transactions": transactions,
+
               "traded_picks": traded_picks,
+
               "trending": {
-                  "add_48h": trending_add,
-                  "drop_48h": trending_drop
+                  "lookback_hours": 48,
+                  "add": trending_add,
+                  "drop": trending_drop
               },
-              "rostered_player_ids": sorted(rostered),
-              "free_agents": free_agents,
-              "waiver_candidate_count": len(top_candidates),
-              "waiver_candidates": top_candidates,
+
+              "rostered_player_count": len(
+                  rostered_player_ids
+              ),
+
+              "rostered_player_ids": sorted(
+                  rostered_player_ids
+              ),
+
+              "waiver_pool_count": len(
+                  waiver_pool
+              ),
+
+              "waiver_pool": waiver_pool,
+
               "players": players
           }
 
-          with open("league.json", "w", encoding="utf-8") as f:
+          with open(
+              "league.json",
+              "w",
+              encoding="utf-8"
+          ) as f:
               json.dump(
                   output,
                   f,
@@ -296,14 +285,17 @@ jobs:
               )
 
           print(
-              f"Week {current_week}: "
-              f"{len(rostered)} rostered players, "
-              f"{len(free_agents)} free agents, "
-              f"{len(top_candidates)} waiver candidates."
+              f"Schema: GK_RAW_V1 | "
+              f"Week: {current_week} | "
+              f"Rostered: {len(rostered_player_ids)} | "
+              f"Waiver pool: {len(waiver_pool)} | "
+              f"Trending adds: {len(trending_add)} | "
+              f"Trending drops: {len(trending_drop)}"
           )
+
           PY
 
-      - name: Commit updated feed
+      - name: Commit updated raw feed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -313,6 +305,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Update Sleeper league feed"
+            git commit -m "Update Sleeper raw feed"
             git push
           fi
