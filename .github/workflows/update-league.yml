@@ -81,20 +81,30 @@ jobs:
               """
               Convert Sleeper projected stats into this league's points.
 
-              Most Sleeper stat keys match league scoring_settings exactly,
-              including offense, return yards and IDP fields. Kicker made-FG
-              projections need special handling because the projection feed
-              can expose aggregate fgm / fgm_50p fields instead of every
-              scoring band used by the league.
+              Most projection stat keys match scoring_settings directly.
+              Sleeper's weekly projection payload uses a few legacy/special
+              aliases for individual return stats, and kicker projections
+              require reconstruction from FGA/FGM plus distance bands.
               """
               components = {}
               flags = []
               total = 0.0
               matched = False
 
-              # Exact-match scoring for all non-made-FG categories.
+              # -----------------------------------------------------
+              # Exact-match scoring for ordinary categories.
+              # Made-FG bands and generic FG misses are handled below.
+              # Special-teams aliases are handled separately to avoid
+              # double-counting direct kr_yd/st_td fields if they appear.
+              # -----------------------------------------------------
+              skip_exact = set(KICKER_BAND_KEYS) | {
+                  "fgmiss",
+                  "kr_yd",
+                  "st_td"
+              }
+
               for key, weight in scoring_settings.items():
-                  if key in KICKER_BAND_KEYS:
+                  if key in skip_exact:
                       continue
 
                   stat_value = as_number(stats.get(key))
@@ -108,68 +118,214 @@ jobs:
                   total += contribution
                   matched = True
 
-              # Kicker made field goals. Prefer aggregate FGM if supplied,
-              # because current Sleeper projections can omit the 0-39 bands.
+              # -----------------------------------------------------
+              # Special-teams player aliases used by Sleeper projections.
+              # The weekly feed currently exposes kick-return yards as
+              # def_kr_yd on individual returners, while punt-return yards
+              # already use pr_yd. Return TD probability can appear as
+              # def_kr_td and/or pr_td. League scoring uses kr_yd + st_td.
+              # -----------------------------------------------------
+              kr_weight = as_number(scoring_settings.get("kr_yd"))
+              if kr_weight is not None:
+                  kr_value = as_number(stats.get("kr_yd"))
+                  kr_source = "kr_yd"
+
+                  if kr_value is None:
+                      kr_value = as_number(stats.get("def_kr_yd"))
+                      kr_source = "def_kr_yd_as_kr_yd"
+
+                  if kr_value is not None:
+                      contribution = kr_value * kr_weight
+                      components[kr_source] = round(contribution, 6)
+                      total += contribution
+                      matched = True
+
+              st_td_weight = as_number(scoring_settings.get("st_td"))
+              if st_td_weight is not None:
+                  direct_st_td = as_number(stats.get("st_td"))
+
+                  if direct_st_td is not None:
+                      contribution = direct_st_td * st_td_weight
+                      components["st_td"] = round(contribution, 6)
+                      total += contribution
+                      matched = True
+                  else:
+                      return_td = 0.0
+                      return_td_seen = False
+
+                      for source_key in ("def_kr_td", "pr_td"):
+                          value = as_number(stats.get(source_key))
+                          if value is None:
+                              continue
+                          return_td += value
+                          return_td_seen = True
+
+                      if return_td_seen:
+                          contribution = return_td * st_td_weight
+                          components[
+                              "return_td_as_st_td"
+                          ] = round(contribution, 6)
+                          total += contribution
+                          matched = True
+
+              # -----------------------------------------------------
+              # Generic missed-FG scoring.
+              # Sleeper projections frequently provide FGA and FGM instead
+              # of the league scoring key fgmiss, so derive misses exactly.
+              # -----------------------------------------------------
+              fgmiss_weight = as_number(
+                  scoring_settings.get("fgmiss")
+              )
+
+              if fgmiss_weight is not None:
+                  direct_fgmiss = as_number(stats.get("fgmiss"))
+
+                  if direct_fgmiss is not None:
+                      contribution = direct_fgmiss * fgmiss_weight
+                      components["fgmiss"] = round(contribution, 6)
+                      total += contribution
+                      matched = True
+                  else:
+                      fga = as_number(stats.get("fga"))
+                      fgm_for_misses = as_number(stats.get("fgm"))
+
+                      if fga is not None and fgm_for_misses is not None:
+                          misses = max(0.0, fga - fgm_for_misses)
+                          if misses:
+                              contribution = misses * fgmiss_weight
+                              components[
+                                  "fgmiss_derived_from_fga_fgm"
+                              ] = round(contribution, 6)
+                              total += contribution
+                              matched = True
+
+              # -----------------------------------------------------
+              # Kicker made field goals.
+              # 2026 weekly projections expose FGM plus 0-49 bands, while
+              # the 50+ band may be omitted. If so, derive 50+ as the FGM
+              # residual. The 50-59 vs 60+ split is not available, so score
+              # the residual conservatively at the 50-59 rate and flag it.
+              # -----------------------------------------------------
               fgm = as_number(stats.get("fgm"))
 
-              if fgm is not None:
-                  fgm_40_49 = as_number(stats.get("fgm_40_49")) or 0.0
-                  fgm_50p = as_number(stats.get("fgm_50p")) or 0.0
-                  fgm_60p = as_number(stats.get("fgm_60p"))
+              direct_bands = {}
+              for key in (
+                  "fgm_0_19",
+                  "fgm_20_29",
+                  "fgm_30_39",
+                  "fgm_40_49",
+                  "fgm_50_59",
+                  "fgm_60p"
+              ):
+                  value = as_number(stats.get(key))
+                  if value is not None:
+                      direct_bands[key] = max(0.0, value)
 
-                  short_made = max(
+              # Score directly published 0-49 bands.
+              for key in (
+                  "fgm_0_19",
+                  "fgm_20_29",
+                  "fgm_30_39",
+                  "fgm_40_49"
+              ):
+                  value = direct_bands.get(key)
+                  weight = as_number(scoring_settings.get(key))
+
+                  if value is None or weight is None:
+                      continue
+
+                  if value:
+                      contribution = value * weight
+                      components[key] = round(contribution, 6)
+                      total += contribution
+                      matched = True
+
+              direct_50_59 = direct_bands.get("fgm_50_59")
+              direct_60p = direct_bands.get("fgm_60p")
+              aggregate_50p = as_number(stats.get("fgm_50p"))
+
+              # If Sleeper gives aggregate FGM and aggregate 50+ but omits
+              # one or more 0-39 sub-bands, derive the missing short makes.
+              # This is exact for Goulash Kingdom because every 0-39 FG is
+              # worth the same 3 points.
+              if fgm is not None and aggregate_50p is not None:
+                  fgm_40_49 = direct_bands.get("fgm_40_49", 0.0)
+                  total_0_39 = max(
                       0.0,
-                      fgm - fgm_40_49 - fgm_50p
+                      fgm - fgm_40_49 - aggregate_50p
                   )
-
-                  short_weights = [
-                      as_number(scoring_settings.get(key))
+                  published_0_39 = sum(
+                      direct_bands.get(key, 0.0)
                       for key in (
                           "fgm_0_19",
                           "fgm_20_29",
                           "fgm_30_39"
                       )
-                      if as_number(
-                          scoring_settings.get(key)
-                      ) is not None
-                  ]
-
-                  if short_weights and short_made:
-                      # In Goulash Kingdom all 0-39 bands are 3 points.
-                      # If another league uses different short-FG bands and
-                      # Sleeper gives only aggregate FGM, preserve the score
-                      # but flag that the split was unavailable.
-                      if max(short_weights) != min(short_weights):
-                          flags.append(
-                              "kicker_0_39_band_split_unavailable"
-                          )
-
-                      short_weight = short_weights[-1]
-                      contribution = short_made * short_weight
-                      components[
-                          "fgm_0_39_derived"
-                      ] = round(contribution, 6)
-                      total += contribution
-                      matched = True
-
-                  weight_40_49 = as_number(
-                      scoring_settings.get("fgm_40_49")
+                  )
+                  missing_0_39 = max(
+                      0.0,
+                      total_0_39 - published_0_39
                   )
 
-                  if (
-                      weight_40_49 is not None
-                      and fgm_40_49
-                  ):
-                      contribution = (
-                          fgm_40_49 * weight_40_49
-                      )
-                      components[
-                          "fgm_40_49"
-                      ] = round(contribution, 6)
-                      total += contribution
-                      matched = True
+                  if missing_0_39:
+                      short_weights = [
+                          as_number(scoring_settings.get(key))
+                          for key in (
+                              "fgm_0_19",
+                              "fgm_20_29",
+                              "fgm_30_39"
+                          )
+                          if as_number(
+                              scoring_settings.get(key)
+                          ) is not None
+                      ]
 
-                  if fgm_50p:
+                      if short_weights:
+                          if max(short_weights) != min(short_weights):
+                              flags.append(
+                                  "kicker_0_39_band_split_unavailable"
+                              )
+                          short_weight = short_weights[-1]
+                          contribution = missing_0_39 * short_weight
+                          components[
+                              "fgm_0_39_missing_derived"
+                          ] = round(contribution, 6)
+                          total += contribution
+                          matched = True
+
+              if direct_50_59 is not None or direct_60p is not None:
+                  for key, value in (
+                      ("fgm_50_59", direct_50_59),
+                      ("fgm_60p", direct_60p)
+                  ):
+                      if value is None:
+                          continue
+                      weight = as_number(scoring_settings.get(key))
+                      if weight is None:
+                          continue
+                      if value:
+                          contribution = value * weight
+                          components[key] = round(contribution, 6)
+                          total += contribution
+                          matched = True
+
+              else:
+                  # Use Sleeper's explicit aggregate 50+ field if present.
+                  # Otherwise derive it from total FGM minus every published
+                  # 0-49 band. Missing short bands in the weekly feed mean 0.
+                  if aggregate_50p is None and fgm is not None:
+                      made_0_49 = sum(
+                          direct_bands.get(key, 0.0)
+                          for key in (
+                              "fgm_0_19",
+                              "fgm_20_29",
+                              "fgm_30_39",
+                              "fgm_40_49"
+                          )
+                      )
+                      aggregate_50p = max(0.0, fgm - made_0_49)
+
+                  if aggregate_50p is not None and aggregate_50p > 0:
                       weight_50_59 = as_number(
                           scoring_settings.get("fgm_50_59")
                       )
@@ -177,152 +333,26 @@ jobs:
                           scoring_settings.get("fgm_60p")
                       )
 
-                      if (
-                          fgm_60p is not None
-                          and weight_60p is not None
-                      ):
-                          made_60p = min(
-                              max(0.0, fgm_60p),
-                              fgm_50p
-                          )
-                          made_50_59 = max(
-                              0.0,
-                              fgm_50p - made_60p
-                          )
+                      if weight_50_59 is not None:
+                          contribution = aggregate_50p * weight_50_59
+                          components[
+                              "fgm_50p_as_50_59"
+                          ] = round(contribution, 6)
+                          total += contribution
+                          matched = True
 
                           if (
-                              weight_50_59 is not None
-                              and made_50_59
+                              weight_60p is not None
+                              and weight_60p != weight_50_59
                           ):
-                              contribution = (
-                                  made_50_59
-                                  * weight_50_59
-                              )
-                              components[
-                                  "fgm_50_59_derived"
-                              ] = round(contribution, 6)
-                              total += contribution
-                              matched = True
-
-                          if made_60p:
-                              contribution = (
-                                  made_60p * weight_60p
-                              )
-                              components[
-                                  "fgm_60p"
-                              ] = round(contribution, 6)
-                              total += contribution
-                              matched = True
-
-                      elif weight_50_59 is not None:
-                          # If Sleeper does not split 60+ from 50+, score
-                          # the whole 50+ projection at the 50-59 value and
-                          # expose an approximation flag. This avoids silently
-                          # awarding unverified 60+ bonuses.
-                          contribution = (
-                              fgm_50p * weight_50_59
-                          )
-                          components[
-                              "fgm_50p_as_50_59"
-                          ] = round(contribution, 6)
-                          total += contribution
-                          matched = True
-
-                          if weight_60p is not None:
                               flags.append(
                                   "kicker_60_plus_split_unavailable"
                               )
 
-              else:
-                  # Some projection payloads expose exact bands but omit
-                  # aggregate FGM. Score any exact bands that are present.
-                  direct_short_present = False
-
-                  for key in (
-                      "fgm_0_19",
-                      "fgm_20_29",
-                      "fgm_30_39",
-                      "fgm_40_49",
-                      "fgm_50_59",
-                      "fgm_60p"
-                  ):
-                      stat_value = as_number(stats.get(key))
-                      weight_value = as_number(
-                          scoring_settings.get(key)
-                      )
-
-                      if (
-                          stat_value is None
-                          or weight_value is None
-                      ):
-                          continue
-
-                      if key in {
-                          "fgm_0_19",
-                          "fgm_20_29",
-                          "fgm_30_39"
-                      }:
-                          direct_short_present = True
-
-                      contribution = (
-                          stat_value * weight_value
-                      )
-                      components[key] = round(
-                          contribution,
-                          6
-                      )
-                      total += contribution
-                      matched = True
-
-                  # Current Sleeper K projections can expose fgm_50p
-                  # without a league-matching fgm_50_59 field. Treat it
-                  # conservatively as 50-59 and flag the missing 60+ split.
-                  fgm_50p = as_number(stats.get("fgm_50p"))
-                  direct_50_59 = as_number(
-                      stats.get("fgm_50_59")
-                  )
-                  direct_60p = as_number(stats.get("fgm_60p"))
-
-                  if (
-                      fgm_50p is not None
-                      and direct_50_59 is None
-                      and direct_60p is None
-                  ):
-                      weight_50_59 = as_number(
-                          scoring_settings.get("fgm_50_59")
-                      )
-
-                      if weight_50_59 is not None:
-                          contribution = (
-                              fgm_50p * weight_50_59
-                          )
-                          components[
-                              "fgm_50p_as_50_59"
-                          ] = round(contribution, 6)
-                          total += contribution
-                          matched = True
-
-                          if as_number(
-                              scoring_settings.get("fgm_60p")
-                          ) is not None:
-                              flags.append(
-                                  "kicker_60_plus_split_unavailable"
-                              )
-
-                  # Sleeper's weekly kicker projection feed may omit all
-                  # sub-40 made-FG fields. In that case a fully exact GK
-                  # kicker score cannot be reconstructed from raw bands.
-                  if (
-                      not direct_short_present
-                      and (
-                          as_number(stats.get("fgm_40_49")) is not None
-                          or fgm_50p is not None
-                          or as_number(stats.get("xpm")) is not None
-                      )
-                  ):
-                      flags.append(
-                          "kicker_sub40_projection_unavailable"
-                      )
+              # If aggregate FGM exists but no distance bands at all, the
+              # custom kicker score is not reconstructible with confidence.
+              if fgm is not None and not direct_bands and aggregate_50p is None:
+                  flags.append("kicker_distance_bands_unavailable")
 
               if not matched:
                   return None, {}, flags
@@ -398,8 +428,12 @@ jobs:
                   "pass_int": -2.0,
                   "rec": 1.0,
                   "rec_yd": 0.1,
+                  "rec_td": 6.0,
+                  "rush_yd": 0.1,
+                  "rush_td": 6.0,
                   "kr_yd": 0.04,
                   "pr_yd": 0.04,
+                  "st_td": 6.0,
                   "idp_tkl_solo": 2.0,
                   "idp_tkl_ast": 1.0,
                   "idp_tkl_loss": 2.0,
@@ -411,7 +445,9 @@ jobs:
                   "fgm_40_49": 4.0,
                   "fgm_50_59": 5.0,
                   "fgm_60p": 6.0,
-                  "xpm": 1.0
+                  "fgmiss": -2.0,
+                  "xpm": 1.0,
+                  "xpmiss": -1.0
               }
 
               cases = [
@@ -450,6 +486,31 @@ jobs:
                           "xpm": 2
                       },
                       14.0
+                  ),
+                  (
+                      {
+                          "rec": 1.17,
+                          "rec_yd": 12.88,
+                          "rec_td": 0.09,
+                          "rush_yd": 1.39,
+                          "rush_td": 0.01,
+                          "def_kr_yd": 49.88,
+                          "pr_yd": 9.0,
+                          "pr_td": 0.06
+                      },
+                      5.91
+                  ),
+                  (
+                      {
+                          "fga": 2.29,
+                          "fgm": 1.96,
+                          "fgm_20_29": 0.34,
+                          "fgm_30_39": 0.50,
+                          "fgm_40_49": 0.45,
+                          "xpm": 3.03,
+                          "xpmiss": 0.13
+                      },
+                      9.91
                   )
               ]
 
