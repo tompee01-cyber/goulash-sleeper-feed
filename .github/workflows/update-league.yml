@@ -30,6 +30,7 @@ jobs:
           LEAGUE_ID = os.environ["LEAGUE_ID"]
           BASE = "https://api.sleeper.app/v1"
           SCHEDULE_BASE = "https://api.sleeper.app/schedule/nfl"
+          PROJECTION_BASE = "https://api.sleeper.com/projections/nfl"
           PACIFIC = ZoneInfo("America/Los_Angeles")
 
           def get_url(url):
@@ -42,6 +43,431 @@ jobs:
 
           def get(path):
               return get_url(BASE + path)
+
+          def get_projection_url(url):
+              # Sleeper's projection host is undocumented and can reject
+              # generic programmatic user agents. Use a browser-like UA.
+              req = urllib.request.Request(
+                  url,
+                  headers={
+                      "User-Agent": (
+                          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                          "AppleWebKit/537.36 (KHTML, like Gecko) "
+                          "Chrome/152.0.0.0 Safari/537.36"
+                      ),
+                      "Accept": "application/json"
+                  }
+              )
+              with urllib.request.urlopen(req, timeout=90) as response:
+                  return json.load(response)
+
+          def as_number(value):
+              if isinstance(value, bool):
+                  return None
+              if isinstance(value, (int, float)):
+                  return float(value)
+              return None
+
+          KICKER_BAND_KEYS = (
+              "fgm_0_19",
+              "fgm_20_29",
+              "fgm_30_39",
+              "fgm_40_49",
+              "fgm_50_59",
+              "fgm_60p"
+          )
+
+          def score_projection(stats, scoring_settings):
+              """
+              Convert Sleeper projected stats into this league's points.
+
+              Most Sleeper stat keys match league scoring_settings exactly,
+              including offense, return yards and IDP fields. Kicker made-FG
+              projections need special handling because the projection feed
+              can expose aggregate fgm / fgm_50p fields instead of every
+              scoring band used by the league.
+              """
+              components = {}
+              flags = []
+              total = 0.0
+              matched = False
+
+              # Exact-match scoring for all non-made-FG categories.
+              for key, weight in scoring_settings.items():
+                  if key in KICKER_BAND_KEYS:
+                      continue
+
+                  stat_value = as_number(stats.get(key))
+                  weight_value = as_number(weight)
+
+                  if stat_value is None or weight_value is None:
+                      continue
+
+                  contribution = stat_value * weight_value
+                  components[key] = round(contribution, 6)
+                  total += contribution
+                  matched = True
+
+              # Kicker made field goals. Prefer aggregate FGM if supplied,
+              # because current Sleeper projections can omit the 0-39 bands.
+              fgm = as_number(stats.get("fgm"))
+
+              if fgm is not None:
+                  fgm_40_49 = as_number(stats.get("fgm_40_49")) or 0.0
+                  fgm_50p = as_number(stats.get("fgm_50p")) or 0.0
+                  fgm_60p = as_number(stats.get("fgm_60p"))
+
+                  short_made = max(
+                      0.0,
+                      fgm - fgm_40_49 - fgm_50p
+                  )
+
+                  short_weights = [
+                      as_number(scoring_settings.get(key))
+                      for key in (
+                          "fgm_0_19",
+                          "fgm_20_29",
+                          "fgm_30_39"
+                      )
+                      if as_number(
+                          scoring_settings.get(key)
+                      ) is not None
+                  ]
+
+                  if short_weights and short_made:
+                      # In Goulash Kingdom all 0-39 bands are 3 points.
+                      # If another league uses different short-FG bands and
+                      # Sleeper gives only aggregate FGM, preserve the score
+                      # but flag that the split was unavailable.
+                      if max(short_weights) != min(short_weights):
+                          flags.append(
+                              "kicker_0_39_band_split_unavailable"
+                          )
+
+                      short_weight = short_weights[-1]
+                      contribution = short_made * short_weight
+                      components[
+                          "fgm_0_39_derived"
+                      ] = round(contribution, 6)
+                      total += contribution
+                      matched = True
+
+                  weight_40_49 = as_number(
+                      scoring_settings.get("fgm_40_49")
+                  )
+
+                  if (
+                      weight_40_49 is not None
+                      and fgm_40_49
+                  ):
+                      contribution = (
+                          fgm_40_49 * weight_40_49
+                      )
+                      components[
+                          "fgm_40_49"
+                      ] = round(contribution, 6)
+                      total += contribution
+                      matched = True
+
+                  if fgm_50p:
+                      weight_50_59 = as_number(
+                          scoring_settings.get("fgm_50_59")
+                      )
+                      weight_60p = as_number(
+                          scoring_settings.get("fgm_60p")
+                      )
+
+                      if (
+                          fgm_60p is not None
+                          and weight_60p is not None
+                      ):
+                          made_60p = min(
+                              max(0.0, fgm_60p),
+                              fgm_50p
+                          )
+                          made_50_59 = max(
+                              0.0,
+                              fgm_50p - made_60p
+                          )
+
+                          if (
+                              weight_50_59 is not None
+                              and made_50_59
+                          ):
+                              contribution = (
+                                  made_50_59
+                                  * weight_50_59
+                              )
+                              components[
+                                  "fgm_50_59_derived"
+                              ] = round(contribution, 6)
+                              total += contribution
+                              matched = True
+
+                          if made_60p:
+                              contribution = (
+                                  made_60p * weight_60p
+                              )
+                              components[
+                                  "fgm_60p"
+                              ] = round(contribution, 6)
+                              total += contribution
+                              matched = True
+
+                      elif weight_50_59 is not None:
+                          # If Sleeper does not split 60+ from 50+, score
+                          # the whole 50+ projection at the 50-59 value and
+                          # expose an approximation flag. This avoids silently
+                          # awarding unverified 60+ bonuses.
+                          contribution = (
+                              fgm_50p * weight_50_59
+                          )
+                          components[
+                              "fgm_50p_as_50_59"
+                          ] = round(contribution, 6)
+                          total += contribution
+                          matched = True
+
+                          if weight_60p is not None:
+                              flags.append(
+                                  "kicker_60_plus_split_unavailable"
+                              )
+
+              else:
+                  # Some projection payloads expose exact bands but omit
+                  # aggregate FGM. Score any exact bands that are present.
+                  direct_short_present = False
+
+                  for key in (
+                      "fgm_0_19",
+                      "fgm_20_29",
+                      "fgm_30_39",
+                      "fgm_40_49",
+                      "fgm_50_59",
+                      "fgm_60p"
+                  ):
+                      stat_value = as_number(stats.get(key))
+                      weight_value = as_number(
+                          scoring_settings.get(key)
+                      )
+
+                      if (
+                          stat_value is None
+                          or weight_value is None
+                      ):
+                          continue
+
+                      if key in {
+                          "fgm_0_19",
+                          "fgm_20_29",
+                          "fgm_30_39"
+                      }:
+                          direct_short_present = True
+
+                      contribution = (
+                          stat_value * weight_value
+                      )
+                      components[key] = round(
+                          contribution,
+                          6
+                      )
+                      total += contribution
+                      matched = True
+
+                  # Current Sleeper K projections can expose fgm_50p
+                  # without a league-matching fgm_50_59 field. Treat it
+                  # conservatively as 50-59 and flag the missing 60+ split.
+                  fgm_50p = as_number(stats.get("fgm_50p"))
+                  direct_50_59 = as_number(
+                      stats.get("fgm_50_59")
+                  )
+                  direct_60p = as_number(stats.get("fgm_60p"))
+
+                  if (
+                      fgm_50p is not None
+                      and direct_50_59 is None
+                      and direct_60p is None
+                  ):
+                      weight_50_59 = as_number(
+                          scoring_settings.get("fgm_50_59")
+                      )
+
+                      if weight_50_59 is not None:
+                          contribution = (
+                              fgm_50p * weight_50_59
+                          )
+                          components[
+                              "fgm_50p_as_50_59"
+                          ] = round(contribution, 6)
+                          total += contribution
+                          matched = True
+
+                          if as_number(
+                              scoring_settings.get("fgm_60p")
+                          ) is not None:
+                              flags.append(
+                                  "kicker_60_plus_split_unavailable"
+                              )
+
+                  # Sleeper's weekly kicker projection feed may omit all
+                  # sub-40 made-FG fields. In that case a fully exact GK
+                  # kicker score cannot be reconstructed from raw bands.
+                  if (
+                      not direct_short_present
+                      and (
+                          as_number(stats.get("fgm_40_49")) is not None
+                          or fgm_50p is not None
+                          or as_number(stats.get("xpm")) is not None
+                      )
+                  ):
+                      flags.append(
+                          "kicker_sub40_projection_unavailable"
+                      )
+
+              if not matched:
+                  return None, {}, flags
+
+              return round(total, 2), components, flags
+
+          def normalize_projection_payload(payload):
+              """Return {player_id: projected_stats} across known formats."""
+              normalized = {}
+
+              if isinstance(payload, list):
+                  items = [(None, item) for item in payload]
+
+              elif isinstance(payload, dict):
+                  data = payload.get("data")
+
+                  if isinstance(data, list):
+                      items = [
+                          (None, item)
+                          for item in data
+                      ]
+                  else:
+                      items = list(payload.items())
+
+              else:
+                  return normalized
+
+              for fallback_pid, item in items:
+                  if not isinstance(item, dict):
+                      continue
+
+                  pid = item.get("player_id")
+
+                  player_obj = item.get("player")
+                  if (
+                      not pid
+                      and isinstance(player_obj, dict)
+                  ):
+                      pid = player_obj.get("player_id")
+
+                  if not pid and fallback_pid is not None:
+                      pid = fallback_pid
+
+                  if not pid:
+                      continue
+
+                  nested_stats = item.get("stats")
+
+                  if isinstance(nested_stats, dict):
+                      stats = dict(nested_stats)
+                  else:
+                      # Some Sleeper projection endpoints return the stat
+                      # fields directly under each player_id. Keep numeric
+                      # fields only; score_projection ignores non-scoring keys.
+                      stats = {
+                          key: value
+                          for key, value in item.items()
+                          if (
+                              isinstance(value, (int, float))
+                              and not isinstance(value, bool)
+                          )
+                      }
+
+                  normalized[str(pid)] = stats
+
+              return normalized
+
+          def run_projection_self_tests():
+              """Fail the Action before writing bad projection math."""
+              test_scoring = {
+                  "pass_yd": 0.04,
+                  "pass_td": 5.0,
+                  "pass_int": -2.0,
+                  "rec": 1.0,
+                  "rec_yd": 0.1,
+                  "kr_yd": 0.04,
+                  "pr_yd": 0.04,
+                  "idp_tkl_solo": 2.0,
+                  "idp_tkl_ast": 1.0,
+                  "idp_tkl_loss": 2.0,
+                  "idp_sack": 6.0,
+                  "idp_qb_hit": 1.0,
+                  "fgm_0_19": 3.0,
+                  "fgm_20_29": 3.0,
+                  "fgm_30_39": 3.0,
+                  "fgm_40_49": 4.0,
+                  "fgm_50_59": 5.0,
+                  "fgm_60p": 6.0,
+                  "xpm": 1.0
+              }
+
+              cases = [
+                  (
+                      {
+                          "pass_yd": 250,
+                          "pass_td": 2,
+                          "pass_int": 1
+                      },
+                      18.0
+                  ),
+                  (
+                      {
+                          "rec": 2,
+                          "rec_yd": 20,
+                          "kr_yd": 100,
+                          "pr_yd": 50
+                      },
+                      10.0
+                  ),
+                  (
+                      {
+                          "idp_tkl_solo": 7,
+                          "idp_tkl_ast": 2,
+                          "idp_tkl_loss": 1,
+                          "idp_sack": 1.5,
+                          "idp_qb_hit": 2
+                      },
+                      29.0
+                  ),
+                  (
+                      {
+                          "fgm": 3,
+                          "fgm_40_49": 1,
+                          "fgm_50p": 1,
+                          "xpm": 2
+                      },
+                      14.0
+                  )
+              ]
+
+              for stats, expected in cases:
+                  actual, _, _ = score_projection(
+                      stats,
+                      test_scoring
+                  )
+
+                  if (
+                      actual is None
+                      or abs(actual - expected) > 1e-9
+                  ):
+                      raise AssertionError(
+                          "Projection self-test failed: "
+                          f"expected={expected}, actual={actual}, "
+                          f"stats={stats}"
+                      )
 
           def iso(dt):
               return dt.astimezone(timezone.utc).isoformat() if dt else None
@@ -131,6 +557,8 @@ jobs:
           # ---------------------------------------------------------
 
           now_utc = datetime.now(timezone.utc)
+
+          run_projection_self_tests()
 
           nfl_state = get("/state/nfl")
           current_week = int(nfl_state.get("week") or 1)
@@ -546,6 +974,231 @@ jobs:
                       player
                   )
 
+          # ---------------------------------------------------------
+          # Sleeper weekly projections + GK league scoring
+          #
+          # Projection fetch failure must NOT break the raw roster /
+          # waiver feed. If unavailable, projection_fetch_ok=False and
+          # all week_projection_gk values remain None.
+          # ---------------------------------------------------------
+
+          scoring_settings = league.get(
+              "scoring_settings"
+          ) or {}
+
+          projection_season_type = str(
+              nfl_state.get("season_type")
+              or league.get("season_type")
+              or "regular"
+          )
+
+          if projection_season_type not in {
+              "regular",
+              "pre",
+              "post"
+          }:
+              projection_season_type = "regular"
+
+          projection_urls = [
+              (
+                  f"{PROJECTION_BASE}/{season}/{current_week}"
+                  f"?season_type={projection_season_type}"
+              ),
+              (
+                  "https://api.sleeper.app/v1/projections/nfl/"
+                  f"{projection_season_type}/{season}/{current_week}"
+              )
+          ]
+
+          projection_fetch_ok = False
+          projection_source_url = None
+          projection_fetch_errors = []
+          projection_payload = None
+
+          for projection_url in projection_urls:
+              try:
+                  projection_payload = get_projection_url(
+                      projection_url
+                  )
+                  projection_source_url = projection_url
+                  projection_fetch_ok = True
+                  break
+              except Exception as exc:
+                  projection_fetch_errors.append(
+                      f"{projection_url}: {exc}"
+                  )
+                  print(
+                      "WARNING: projection fetch failed from "
+                      f"{projection_url}: {exc}"
+                  )
+
+          normalized_projection_stats = (
+              normalize_projection_payload(
+                  projection_payload
+              )
+              if projection_fetch_ok
+              else {}
+          )
+
+          if (
+              projection_fetch_ok
+              and not normalized_projection_stats
+          ):
+              print(
+                  "WARNING: projection endpoint returned no "
+                  "normalized player records."
+              )
+
+          weekly_projections = {}
+          projection_scored_count = 0
+          projection_approximation_count = 0
+          projection_stat_keys_seen = set()
+
+          for pid, stats in normalized_projection_stats.items():
+              projection_stat_keys_seen.update(
+                  stats.keys()
+              )
+
+              # Keep the published feed focused on players that are
+              # rostered, waiver-eligible, trending, or transaction-
+              # referenced in this league.
+              if pid not in referenced_ids:
+                  continue
+
+              gk_points, components, flags = (
+                  score_projection(
+                      stats,
+                      scoring_settings
+                  )
+              )
+
+              player_meta = all_players.get(pid) or {}
+              primary_position = player_meta.get("position")
+
+              # Kicker fallback: if Sleeper omits sub-40 FG projection
+              # fields, use Sleeper's own standard projected points as a
+              # clearly-labelled approximation rather than publishing a
+              # knowingly incomplete custom total.
+              if (
+                  primary_position == "K"
+                  and "kicker_sub40_projection_unavailable" in flags
+              ):
+                  sleeper_k_points = as_number(
+                      stats.get("pts_std")
+                  )
+
+                  if sleeper_k_points is not None:
+                      gk_points = round(sleeper_k_points, 2)
+                      components = {
+                          "sleeper_pts_std_fallback": gk_points
+                      }
+                      flags.append(
+                          "kicker_pts_std_fallback_used"
+                      )
+
+              if gk_points is not None:
+                  projection_scored_count += 1
+
+              if flags:
+                  projection_approximation_count += 1
+
+              projection_quality = (
+                  "approximate"
+                  if flags
+                  else (
+                      "exact"
+                      if gk_points is not None
+                      else "unscorable"
+                  )
+              )
+
+              weekly_projections[pid] = {
+                  "player_id": pid,
+                  "season": season,
+                  "season_type": projection_season_type,
+                  "week": current_week,
+                  "gk_projected_points": gk_points,
+                  "projection_quality": projection_quality,
+                  "sleeper_pts_ppr": stats.get("pts_ppr"),
+                  "sleeper_pts_half_ppr": stats.get(
+                      "pts_half_ppr"
+                  ),
+                  "sleeper_pts_std": stats.get("pts_std"),
+                  "approximation_flags": flags,
+                  "scoring_components": components,
+                  "stats": stats
+              }
+
+          # Attach the compact projection fields directly to both
+          # player metadata and waiver-pool records so Work can add a
+          # Week GK Projection column without re-implementing scoring.
+          unavailable_projection_status = (
+              "Projection Feed Unavailable"
+              if not projection_fetch_ok
+              else "No Projection"
+          )
+
+          for pid, player in players.items():
+              projection = weekly_projections.get(pid)
+
+              player["projection_week"] = current_week
+              player["week_projection_gk"] = (
+                  projection.get("gk_projected_points")
+                  if projection
+                  else None
+              )
+              player["week_projection_status"] = (
+                  (
+                      "Approximate"
+                      if projection.get(
+                          "projection_quality"
+                      ) == "approximate"
+                      else "OK"
+                  )
+                  if (
+                      projection
+                      and projection.get(
+                          "gk_projected_points"
+                      ) is not None
+                  )
+                  else (
+                      "No Scorable Projection Stats"
+                      if projection
+                      else unavailable_projection_status
+                  )
+              )
+
+          for player in waiver_pool:
+              pid = player["player_id"]
+              projection = weekly_projections.get(pid)
+
+              player["projection_week"] = current_week
+              player["week_projection_gk"] = (
+                  projection.get("gk_projected_points")
+                  if projection
+                  else None
+              )
+              player["week_projection_status"] = (
+                  (
+                      "Approximate"
+                      if projection.get(
+                          "projection_quality"
+                      ) == "approximate"
+                      else "OK"
+                  )
+                  if (
+                      projection
+                      and projection.get(
+                          "gk_projected_points"
+                      ) is not None
+                  )
+                  else (
+                      "No Scorable Projection Stats"
+                      if projection
+                      else unavailable_projection_status
+                  )
+              )
+
           availability_counts = {
               "Free Agent": sum(
                   1 for p in waiver_pool
@@ -568,12 +1221,40 @@ jobs:
           output = {
               "schema_version": "GK_RAW_V2",
               "availability_calc_version": "GK_AVAIL_V1",
+              "projection_calc_version": "GK_PROJ_V1",
               "generated_at": iso(now_utc),
               "league_id": LEAGUE_ID,
               "current_week": current_week,
 
               "nfl_state": nfl_state,
               "league": league,
+
+              "projection_status": {
+                  "fetch_ok": projection_fetch_ok,
+                  "season": season,
+                  "season_type": projection_season_type,
+                  "week": current_week,
+                  "source_url": projection_source_url,
+                  "source_urls_attempted": projection_urls,
+                  "fetch_errors": projection_fetch_errors,
+                  "raw_record_count": len(
+                      normalized_projection_stats
+                  ),
+                  "published_record_count": len(
+                      weekly_projections
+                  ),
+                  "scored_record_count": (
+                      projection_scored_count
+                  ),
+                  "approximation_record_count": (
+                      projection_approximation_count
+                  ),
+                  "stat_keys_seen": sorted(
+                      projection_stat_keys_seen
+                  )
+              },
+
+              "weekly_projections": weekly_projections,
 
               "users": users,
               "rosters": rosters,
@@ -645,7 +1326,13 @@ jobs:
               f"Waivers (W): {availability_counts['Waivers']} | "
               f"Unknown (?): {availability_counts['Unknown']} | "
               f"Trending adds: {len(trending_add)} | "
-              f"Trending drops: {len(trending_drop)}"
+              f"Trending drops: {len(trending_drop)} | "
+              f"Projection: GK_PROJ_V1 | "
+              f"Projection fetch: {projection_fetch_ok} | "
+              f"Projection published: {len(weekly_projections)} | "
+              f"Projection scored: {projection_scored_count} | "
+              f"Projection approximations: "
+              f"{projection_approximation_count}"
           )
 
           PY
@@ -660,6 +1347,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Update Sleeper raw feed GK_RAW_V2"
+            git commit -m "Update Sleeper raw feed GK_RAW_V2 + GK_PROJ_V1"
             git push
           fi
