@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-09-22T15:23:19.693329+00:00",
+  "generated_at": "2026-09-22T18:27:06.105948+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 3,
@@ -15,7 +15,7 @@
       3
     ],
     "published_week_count": 2,
-    "published_player_week_records": 2368,
+    "published_player_week_records": 2367,
     "fetch_errors": [
       "week 3: no snap rows available; existing history preserved"
     ]
@@ -49839,33 +49839,6 @@
         "primary_snap_pct": 0.15,
         "source": "nflverse/PFR"
       },
-      "11281": {
-        "season": 2026,
-        "week": 2,
-        "game_type": "REG",
-        "game_id": "2026_02_MIA_SF",
-        "pfr_game_id": "202609200sfo",
-        "full_name": "Liam Anderson",
-        "pfr_player_id": "AndeLi00",
-        "source_position": "LB",
-        "team": "MIA",
-        "opponent": "SF",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 4,
-        "def_snap_pct": 0.08,
-        "st_snaps": 12,
-        "st_snap_pct": 0.48,
-        "team_off_snaps": 59,
-        "team_def_snaps": 52,
-        "team_st_snaps": 25,
-        "player_id": "11281",
-        "match_quality": "NameTeam",
-        "primary_unit": "DEF",
-        "primary_snaps": 4,
-        "primary_snap_pct": 0.08,
-        "source": "nflverse/PFR"
-      },
       "13566": {
         "season": 2026,
         "week": 2,
@@ -77279,16 +77252,6 @@
         2
       ]
     },
-    "11281": {
-      "player_id": "11281",
-      "latest_snap_week": 2,
-      "latest_primary_snaps": 4,
-      "latest_primary_snap_pct": 0.08,
-      "last3_primary_snap_pct": 0.08,
-      "last3_weeks": [
-        2
-      ]
-    },
     "13566": {
       "player_id": "13566",
       "latest_snap_week": 2,
@@ -89322,6 +89285,30 @@
         "def_snap_pct": 0.0,
         "st_snaps": 4,
         "st_snap_pct": 0.16,
+        "team_off_snaps": 59,
+        "team_def_snaps": 52,
+        "team_st_snaps": 25,
+        "player_id": null,
+        "match_quality": "Unmatched"
+      },
+      {
+        "season": 2026,
+        "week": 2,
+        "game_type": "REG",
+        "game_id": "2026_02_MIA_SF",
+        "pfr_game_id": "202609200sfo",
+        "full_name": "Liam Anderson",
+        "normalized_name": "liam anderson",
+        "pfr_player_id": "AndeLi00",
+        "source_position": "LB",
+        "team": "MIA",
+        "opponent": "SF",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 4,
+        "def_snap_pct": 0.08,
+        "st_snaps": 12,
+        "st_snap_pct": 0.48,
         "team_off_snaps": 59,
         "team_def_snaps": 52,
         "team_st_snaps": 25,
