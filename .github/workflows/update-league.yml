@@ -16,9 +16,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Test GK actuals logic
+      - name: Test GK raw feed logic
         run: |
-          python -m unittest tests.test_gk_actuals -v
+          python -m unittest tests.test_gk_actuals tests.test_gk_snaps -v
 
       - name: Build Sleeper raw feed
         env:
@@ -1412,6 +1412,14 @@ jobs:
             --league-json league.json \
             --actuals-json actuals.json
 
+      - name: Build nflverse snap history
+        id: snaps
+        continue-on-error: true
+        run: |
+          python scripts/gk_snaps.py \
+            --league-json league.json \
+            --snap-json snap_counts.json
+
       - name: Commit updated raw feed
         run: |
           git config user.name "github-actions[bot]"
@@ -1421,11 +1429,14 @@ jobs:
           if [ -f actuals.json ]; then
             git add actuals.json
           fi
+          if [ -f snap_counts.json ]; then
+            git add snap_counts.json
+          fi
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Update Sleeper feeds GK_RAW_V2 + GK_PROJ_V1 + GK_ACTUAL_V1"
+            git commit -m "Update GK feeds RAW_V2 + PROJ_V1 + ACTUAL_V1 + GK_SNAPS_V1"
             git push
           fi
 
@@ -1433,4 +1444,10 @@ jobs:
         if: steps.actuals.outcome == 'failure'
         run: |
           echo "::error::GK actuals build failed. league.json was still allowed to commit."
+          exit 1
+
+      - name: Surface snap build failure
+        if: steps.snaps.outcome == 'failure'
+        run: |
+          echo "::error::GK snap build failed. league.json and actuals.json were still allowed to commit."
           exit 1
