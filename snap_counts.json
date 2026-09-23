@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-09-23T12:28:40.143176+00:00",
+  "generated_at": "2026-09-23T15:24:16.129339+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 3,
@@ -15,7 +15,7 @@
       3
     ],
     "published_week_count": 2,
-    "published_player_week_records": 2367,
+    "published_player_week_records": 2368,
     "fetch_errors": [
       "week 3: no snap rows available; existing history preserved"
     ]
@@ -11952,6 +11952,33 @@
         "player_id": "13580",
         "match_quality": "Exact",
         "primary_unit": "OFF",
+        "primary_snaps": 0,
+        "primary_snap_pct": 0.0,
+        "source": "nflverse/PFR"
+      },
+      "6476": {
+        "season": 2026,
+        "week": 1,
+        "game_type": "REG",
+        "game_id": "2026_01_CLE_JAX",
+        "pfr_game_id": "202609130jax",
+        "full_name": "D'Angelo Ross",
+        "pfr_player_id": "RossDA03",
+        "source_position": "CB",
+        "team": "CLE",
+        "opponent": "JAX",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 8,
+        "st_snap_pct": 0.35,
+        "team_off_snaps": 51,
+        "team_def_snaps": 57,
+        "team_st_snaps": 23,
+        "player_id": "6476",
+        "match_quality": "Exact",
+        "primary_unit": "DEF",
         "primary_snaps": 0,
         "primary_snap_pct": 0.0,
         "source": "nflverse/PFR"
@@ -68775,6 +68802,16 @@
         2
       ]
     },
+    "6476": {
+      "player_id": "6476",
+      "latest_snap_week": 1,
+      "latest_primary_snaps": 0,
+      "latest_primary_snap_pct": 0.0,
+      "last3_primary_snap_pct": 0.0,
+      "last3_weeks": [
+        1
+      ]
+    },
     "11261": {
       "player_id": "11261",
       "latest_snap_week": 2,
@@ -80427,30 +80464,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 2,
         "st_snap_pct": 0.09,
-        "team_off_snaps": 51,
-        "team_def_snaps": 57,
-        "team_st_snaps": 23,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 1,
-        "game_type": "REG",
-        "game_id": "2026_01_CLE_JAX",
-        "pfr_game_id": "202609130jax",
-        "full_name": "D'Angelo Ross",
-        "normalized_name": "d angelo ross",
-        "pfr_player_id": "RossDA03",
-        "source_position": "CB",
-        "team": "CLE",
-        "opponent": "JAX",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 8,
-        "st_snap_pct": 0.35,
         "team_off_snaps": 51,
         "team_def_snaps": 57,
         "team_st_snaps": 23,
