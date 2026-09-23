@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-09-23T18:26:47.597664+00:00",
+  "generated_at": "2026-09-23T21:23:03.023781+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 3,
@@ -15,7 +15,7 @@
       3
     ],
     "published_week_count": 2,
-    "published_player_week_records": 2368,
+    "published_player_week_records": 2367,
     "fetch_errors": [
       "week 3: no snap rows available; existing history preserved"
     ]
@@ -57831,33 +57831,6 @@
         "primary_snap_pct": 0.0,
         "source": "nflverse/PFR"
       },
-      "13877": {
-        "season": 2026,
-        "week": 2,
-        "game_type": "REG",
-        "game_id": "2026_02_PHI_TEN",
-        "pfr_game_id": "202609200oti",
-        "full_name": "Maximus Pulley",
-        "pfr_player_id": "PullMa00",
-        "source_position": "S",
-        "team": "PHI",
-        "opponent": "TEN",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 6,
-        "st_snap_pct": 0.26,
-        "team_off_snaps": 76,
-        "team_def_snaps": 53,
-        "team_st_snaps": 23,
-        "player_id": "13877",
-        "match_quality": "NameTeam",
-        "primary_unit": "DEF",
-        "primary_snaps": 0,
-        "primary_snap_pct": 0.0,
-        "source": "nflverse/PFR"
-      },
       "12678": {
         "season": 2026,
         "week": 2,
@@ -77569,16 +77542,6 @@
         2
       ]
     },
-    "13877": {
-      "player_id": "13877",
-      "latest_snap_week": 2,
-      "latest_primary_snaps": 0,
-      "latest_primary_snap_pct": 0.0,
-      "last3_primary_snap_pct": 0.0,
-      "last3_weeks": [
-        2
-      ]
-    },
     "12529": {
       "player_id": "12529",
       "latest_snap_week": 2,
@@ -91266,6 +91229,30 @@
         "def_snap_pct": 0.0,
         "st_snaps": 0,
         "st_snap_pct": 0.0,
+        "team_off_snaps": 76,
+        "team_def_snaps": 53,
+        "team_st_snaps": 23,
+        "player_id": null,
+        "match_quality": "Unmatched"
+      },
+      {
+        "season": 2026,
+        "week": 2,
+        "game_type": "REG",
+        "game_id": "2026_02_PHI_TEN",
+        "pfr_game_id": "202609200oti",
+        "full_name": "Maximus Pulley",
+        "normalized_name": "maximus pulley",
+        "pfr_player_id": "PullMa00",
+        "source_position": "S",
+        "team": "PHI",
+        "opponent": "TEN",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 6,
+        "st_snap_pct": 0.26,
         "team_off_snaps": 76,
         "team_def_snaps": 53,
         "team_st_snaps": 23,
