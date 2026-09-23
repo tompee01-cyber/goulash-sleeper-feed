@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-09-23T15:24:16.129339+00:00",
+  "generated_at": "2026-09-23T18:26:47.597664+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 3,
@@ -46950,33 +46950,6 @@
         "primary_snap_pct": 0.0,
         "source": "nflverse/PFR"
       },
-      "6045": {
-        "season": 2026,
-        "week": 2,
-        "game_type": "REG",
-        "game_id": "2026_02_LV_LAC",
-        "pfr_game_id": "202609200sdg",
-        "full_name": "Gary Jennings Jr",
-        "pfr_player_id": "JennGa00",
-        "source_position": "WR",
-        "team": "LAC",
-        "opponent": "LV",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 10,
-        "st_snap_pct": 0.37,
-        "team_off_snaps": 68,
-        "team_def_snaps": 63,
-        "team_st_snaps": 27,
-        "player_id": "6045",
-        "match_quality": "Exact",
-        "primary_unit": "OFF",
-        "primary_snaps": 0,
-        "primary_snap_pct": 0.0,
-        "source": "nflverse/PFR"
-      },
       "8259": {
         "season": 2026,
         "week": 2,
@@ -49864,6 +49837,33 @@
         "primary_unit": "DEF",
         "primary_snaps": 8,
         "primary_snap_pct": 0.15,
+        "source": "nflverse/PFR"
+      },
+      "11281": {
+        "season": 2026,
+        "week": 2,
+        "game_type": "REG",
+        "game_id": "2026_02_MIA_SF",
+        "pfr_game_id": "202609200sfo",
+        "full_name": "Liam Anderson",
+        "pfr_player_id": "AndeLi00",
+        "source_position": "LB",
+        "team": "MIA",
+        "opponent": "SF",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 4,
+        "def_snap_pct": 0.08,
+        "st_snaps": 12,
+        "st_snap_pct": 0.48,
+        "team_off_snaps": 59,
+        "team_def_snaps": 52,
+        "team_st_snaps": 25,
+        "player_id": "11281",
+        "match_quality": "NameTeam",
+        "primary_unit": "DEF",
+        "primary_snaps": 4,
+        "primary_snap_pct": 0.08,
         "source": "nflverse/PFR"
       },
       "13566": {
@@ -77219,16 +77219,6 @@
         2
       ]
     },
-    "6045": {
-      "player_id": "6045",
-      "latest_snap_week": 2,
-      "latest_primary_snaps": 0,
-      "latest_primary_snap_pct": 0.0,
-      "last3_primary_snap_pct": 0.0,
-      "last3_weeks": [
-        2
-      ]
-    },
     "13368": {
       "player_id": "13368",
       "latest_snap_week": 2,
@@ -77285,6 +77275,16 @@
       "latest_primary_snaps": 8,
       "latest_primary_snap_pct": 0.15,
       "last3_primary_snap_pct": 0.15,
+      "last3_weeks": [
+        2
+      ]
+    },
+    "11281": {
+      "player_id": "11281",
+      "latest_snap_week": 2,
+      "latest_primary_snaps": 4,
+      "latest_primary_snap_pct": 0.08,
+      "last3_primary_snap_pct": 0.08,
       "last3_weeks": [
         2
       ]
@@ -88614,6 +88614,30 @@
         "game_type": "REG",
         "game_id": "2026_02_LV_LAC",
         "pfr_game_id": "202609200sdg",
+        "full_name": "Gary Jennings Jr",
+        "normalized_name": "gary jennings",
+        "pfr_player_id": "JennGa00",
+        "source_position": "WR",
+        "team": "LAC",
+        "opponent": "LV",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 10,
+        "st_snap_pct": 0.37,
+        "team_off_snaps": 68,
+        "team_def_snaps": 63,
+        "team_st_snaps": 27,
+        "player_id": null,
+        "match_quality": "Unmatched"
+      },
+      {
+        "season": 2026,
+        "week": 2,
+        "game_type": "REG",
+        "game_id": "2026_02_LV_LAC",
+        "pfr_game_id": "202609200sdg",
         "full_name": "JK Scott",
         "normalized_name": "jk scott",
         "pfr_player_id": "ScotJK00",
@@ -89298,30 +89322,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 4,
         "st_snap_pct": 0.16,
-        "team_off_snaps": 59,
-        "team_def_snaps": 52,
-        "team_st_snaps": 25,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 2,
-        "game_type": "REG",
-        "game_id": "2026_02_MIA_SF",
-        "pfr_game_id": "202609200sfo",
-        "full_name": "Liam Anderson",
-        "normalized_name": "liam anderson",
-        "pfr_player_id": "AndeLi00",
-        "source_position": "LB",
-        "team": "MIA",
-        "opponent": "SF",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 4,
-        "def_snap_pct": 0.08,
-        "st_snaps": 12,
-        "st_snap_pct": 0.48,
         "team_off_snaps": 59,
         "team_def_snaps": 52,
         "team_st_snaps": 25,
