@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-09-29T18:29:29.929346+00:00",
+  "generated_at": "2026-09-29T21:24:41.550662+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 4,
@@ -15,7 +15,7 @@
       4
     ],
     "published_week_count": 3,
-    "published_player_week_records": 3546,
+    "published_player_week_records": 3547,
     "fetch_errors": [
       "week 4: no snap rows available; existing history preserved"
     ]
@@ -56724,6 +56724,33 @@
         "primary_snap_pct": 0.14,
         "source": "nflverse/PFR"
       },
+      "10969": {
+        "season": 2026,
+        "week": 2,
+        "game_type": "REG",
+        "game_id": "2026_02_PHI_TEN",
+        "pfr_game_id": "202609200oti",
+        "full_name": "Owen Pappoe",
+        "pfr_player_id": "PappOw00",
+        "source_position": "LB",
+        "team": "TEN",
+        "opponent": "PHI",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 19,
+        "st_snap_pct": 0.83,
+        "team_off_snaps": 53,
+        "team_def_snaps": 76,
+        "team_st_snaps": 23,
+        "player_id": "10969",
+        "match_quality": "Exact",
+        "primary_unit": "DEF",
+        "primary_snaps": 0,
+        "primary_snap_pct": 0.0,
+        "source": "nflverse/PFR"
+      },
       "7036": {
         "season": 2026,
         "week": 2,
@@ -110446,6 +110473,16 @@
         3
       ]
     },
+    "10969": {
+      "player_id": "10969",
+      "latest_snap_week": 2,
+      "latest_primary_snaps": 0,
+      "latest_primary_snap_pct": 0.0,
+      "last3_primary_snap_pct": 0.0,
+      "last3_weeks": [
+        2
+      ]
+    },
     "11052": {
       "player_id": "11052",
       "latest_snap_week": 2,
@@ -124675,30 +124712,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 4,
         "st_snap_pct": 0.17,
-        "team_off_snaps": 53,
-        "team_def_snaps": 76,
-        "team_st_snaps": 23,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 2,
-        "game_type": "REG",
-        "game_id": "2026_02_PHI_TEN",
-        "pfr_game_id": "202609200oti",
-        "full_name": "Owen Pappoe",
-        "normalized_name": "owen pappoe",
-        "pfr_player_id": "PappOw00",
-        "source_position": "LB",
-        "team": "TEN",
-        "opponent": "PHI",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 19,
-        "st_snap_pct": 0.83,
         "team_off_snaps": 53,
         "team_def_snaps": 76,
         "team_st_snaps": 23,
