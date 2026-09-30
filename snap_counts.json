@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-09-30T00:33:16.196255+00:00",
+  "generated_at": "2026-09-30T03:26:04.935243+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 4,
@@ -49267,9 +49267,9 @@
         "team_st_snaps": 25,
         "player_id": "14026",
         "match_quality": "NameTeam",
-        "primary_unit": "DEF",
-        "primary_snaps": 0,
-        "primary_snap_pct": 0.0,
+        "primary_unit": "OFF",
+        "primary_snaps": 17,
+        "primary_snap_pct": 0.29,
         "source": "nflverse/PFR"
       },
       "12495": {
@@ -76161,9 +76161,9 @@
         "team_st_snaps": 18,
         "player_id": "14026",
         "match_quality": "NameTeam",
-        "primary_unit": "DEF",
-        "primary_snaps": 0,
-        "primary_snap_pct": 0.0,
+        "primary_unit": "OFF",
+        "primary_snaps": 27,
+        "primary_snap_pct": 0.37,
         "source": "nflverse/PFR"
       },
       "11421": {
@@ -104229,9 +104229,9 @@
     "14026": {
       "player_id": "14026",
       "latest_snap_week": 3,
-      "latest_primary_snaps": 0,
-      "latest_primary_snap_pct": 0.0,
-      "last3_primary_snap_pct": 0.0,
+      "latest_primary_snaps": 27,
+      "latest_primary_snap_pct": 0.37,
+      "last3_primary_snap_pct": 0.22,
       "last3_weeks": [
         1,
         2,
