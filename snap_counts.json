@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-01T15:27:51.006424+00:00",
+  "generated_at": "2026-10-01T18:30:59.609112+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 4,
@@ -15,7 +15,7 @@
       4
     ],
     "published_week_count": 3,
-    "published_player_week_records": 3549,
+    "published_player_week_records": 3546,
     "fetch_errors": [
       "week 4: no snap rows available; existing history preserved"
     ]
@@ -33963,33 +33963,6 @@
         "primary_snap_pct": 0.54,
         "source": "nflverse/PFR"
       },
-      "11305": {
-        "season": 2026,
-        "week": 2,
-        "game_type": "REG",
-        "game_id": "2026_02_CAR_ATL",
-        "pfr_game_id": "202609200atl",
-        "full_name": "Claudin Cherelus",
-        "pfr_player_id": "CherCl00",
-        "source_position": "LB",
-        "team": "CAR",
-        "opponent": "ATL",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 5,
-        "st_snap_pct": 0.21,
-        "team_off_snaps": 66,
-        "team_def_snaps": 69,
-        "team_st_snaps": 24,
-        "player_id": "11305",
-        "match_quality": "Exact",
-        "primary_unit": "DEF",
-        "primary_snaps": 0,
-        "primary_snap_pct": 0.0,
-        "source": "nflverse/PFR"
-      },
       "9758": {
         "season": 2026,
         "week": 2,
@@ -52890,33 +52863,6 @@
         "primary_snap_pct": 0.0,
         "source": "nflverse/PFR"
       },
-      "12041": {
-        "season": 2026,
-        "week": 2,
-        "game_type": "REG",
-        "game_id": "2026_02_NO_BAL",
-        "pfr_game_id": "202609200rav",
-        "full_name": "Carl Jones",
-        "pfr_player_id": "JoneCa05",
-        "source_position": "LB",
-        "team": "BAL",
-        "opponent": "NO",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 14,
-        "st_snap_pct": 0.61,
-        "team_off_snaps": 58,
-        "team_def_snaps": 68,
-        "team_st_snaps": 23,
-        "player_id": "12041",
-        "match_quality": "NameTeam",
-        "primary_unit": "DEF",
-        "primary_snaps": 0,
-        "primary_snap_pct": 0.0,
-        "source": "nflverse/PFR"
-      },
       "11570": {
         "season": 2026,
         "week": 2,
@@ -55642,33 +55588,6 @@
         "primary_unit": "DEF",
         "primary_snaps": 29,
         "primary_snap_pct": 0.47,
-        "source": "nflverse/PFR"
-      },
-      "4371": {
-        "season": 2026,
-        "week": 2,
-        "game_type": "REG",
-        "game_id": "2026_02_NYG_LA",
-        "pfr_game_id": "202609210ram",
-        "full_name": "Josh Tupou",
-        "pfr_player_id": "TupoJo00",
-        "source_position": "DL",
-        "team": "NYG",
-        "opponent": "LA",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 26,
-        "def_snap_pct": 0.42,
-        "st_snaps": 0,
-        "st_snap_pct": 0.0,
-        "team_off_snaps": 58,
-        "team_def_snaps": 62,
-        "team_st_snaps": 24,
-        "player_id": "4371",
-        "match_quality": "Exact",
-        "primary_unit": "DEF",
-        "primary_snaps": 26,
-        "primary_snap_pct": 0.42,
         "source": "nflverse/PFR"
       },
       "11240": {
@@ -98428,13 +98347,12 @@
     },
     "12041": {
       "player_id": "12041",
-      "latest_snap_week": 2,
+      "latest_snap_week": 1,
       "latest_primary_snaps": 0,
       "latest_primary_snap_pct": 0.0,
       "last3_primary_snap_pct": 0.0,
       "last3_weeks": [
-        1,
-        2
+        1
       ]
     },
     "12711": {
@@ -99748,13 +99666,12 @@
     },
     "11305": {
       "player_id": "11305",
-      "latest_snap_week": 2,
-      "latest_primary_snaps": 0,
-      "latest_primary_snap_pct": 0.0,
-      "last3_primary_snap_pct": 0.005,
+      "latest_snap_week": 1,
+      "latest_primary_snaps": 1,
+      "latest_primary_snap_pct": 0.01,
+      "last3_primary_snap_pct": 0.01,
       "last3_weeks": [
-        1,
-        2
+        1
       ]
     },
     "6781": {
@@ -110464,16 +110381,6 @@
         3
       ]
     },
-    "4371": {
-      "player_id": "4371",
-      "latest_snap_week": 2,
-      "latest_primary_snaps": 26,
-      "latest_primary_snap_pct": 0.42,
-      "last3_primary_snap_pct": 0.42,
-      "last3_weeks": [
-        2
-      ]
-    },
     "11240": {
       "player_id": "11240",
       "latest_snap_week": 3,
@@ -119426,6 +119333,30 @@
         "season": 2026,
         "week": 2,
         "game_type": "REG",
+        "game_id": "2026_02_CAR_ATL",
+        "pfr_game_id": "202609200atl",
+        "full_name": "Claudin Cherelus",
+        "normalized_name": "claudin cherelus",
+        "pfr_player_id": "CherCl00",
+        "source_position": "LB",
+        "team": "CAR",
+        "opponent": "ATL",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 5,
+        "st_snap_pct": 0.21,
+        "team_off_snaps": 66,
+        "team_def_snaps": 69,
+        "team_st_snaps": 24,
+        "player_id": null,
+        "match_quality": "Unmatched"
+      },
+      {
+        "season": 2026,
+        "week": 2,
+        "game_type": "REG",
         "game_id": "2026_02_CIN_HOU",
         "pfr_game_id": "202609200htx",
         "full_name": "Wyatt Teller",
@@ -123796,6 +123727,30 @@
         "game_type": "REG",
         "game_id": "2026_02_NO_BAL",
         "pfr_game_id": "202609200rav",
+        "full_name": "Carl Jones",
+        "normalized_name": "carl jones",
+        "pfr_player_id": "JoneCa05",
+        "source_position": "LB",
+        "team": "BAL",
+        "opponent": "NO",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 14,
+        "st_snap_pct": 0.61,
+        "team_off_snaps": 58,
+        "team_def_snaps": 68,
+        "team_st_snaps": 23,
+        "player_id": null,
+        "match_quality": "Unmatched"
+      },
+      {
+        "season": 2026,
+        "week": 2,
+        "game_type": "REG",
+        "game_id": "2026_02_NO_BAL",
+        "pfr_game_id": "202609200rav",
         "full_name": "Nick Moore",
         "normalized_name": "nick moore",
         "pfr_player_id": "MoorNi00",
@@ -124478,6 +124433,30 @@
         "off_snap_pct": 1.0,
         "def_snaps": 0,
         "def_snap_pct": 0.0,
+        "st_snaps": 0,
+        "st_snap_pct": 0.0,
+        "team_off_snaps": 58,
+        "team_def_snaps": 62,
+        "team_st_snaps": 24,
+        "player_id": null,
+        "match_quality": "Unmatched"
+      },
+      {
+        "season": 2026,
+        "week": 2,
+        "game_type": "REG",
+        "game_id": "2026_02_NYG_LA",
+        "pfr_game_id": "202609210ram",
+        "full_name": "Josh Tupou",
+        "normalized_name": "josh tupou",
+        "pfr_player_id": "TupoJo00",
+        "source_position": "DL",
+        "team": "NYG",
+        "opponent": "LA",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 26,
+        "def_snap_pct": 0.42,
         "st_snaps": 0,
         "st_snap_pct": 0.0,
         "team_off_snaps": 58,
