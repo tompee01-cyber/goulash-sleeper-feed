@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-03T18:39:59.333879+00:00",
+  "generated_at": "2026-10-03T23:45:35.675559+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 4,
@@ -15,7 +15,7 @@
       4
     ],
     "published_week_count": 4,
-    "published_player_week_records": 3618,
+    "published_player_week_records": 3619,
     "fetch_errors": []
   },
   "weekly_snaps": {
@@ -44327,6 +44327,33 @@
         "primary_unit": "DEF",
         "primary_snaps": 59,
         "primary_snap_pct": 1.0,
+        "source": "nflverse/PFR"
+      },
+      "5938": {
+        "season": 2026,
+        "week": 2,
+        "game_type": "REG",
+        "game_id": "2026_02_JAX_DEN",
+        "pfr_game_id": "202609200den",
+        "full_name": "Lil'Jordan Humphrey",
+        "pfr_player_id": "HumpLi01",
+        "source_position": "WR",
+        "team": "DEN",
+        "opponent": "JAX",
+        "off_snaps": 3,
+        "off_snap_pct": 0.05,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 0,
+        "st_snap_pct": 0.0,
+        "team_off_snaps": 62,
+        "team_def_snaps": 59,
+        "team_st_snaps": 23,
+        "player_id": "5938",
+        "match_quality": "Exact",
+        "primary_unit": "OFF",
+        "primary_snaps": 3,
+        "primary_snap_pct": 0.05,
         "source": "nflverse/PFR"
       },
       "7641": {
@@ -111992,6 +112019,16 @@
         3
       ]
     },
+    "5938": {
+      "player_id": "5938",
+      "latest_snap_week": 2,
+      "latest_primary_snaps": 3,
+      "latest_primary_snap_pct": 0.05,
+      "last3_primary_snap_pct": 0.05,
+      "last3_weeks": [
+        2
+      ]
+    },
     "13650": {
       "player_id": "13650",
       "latest_snap_week": 3,
@@ -123720,30 +123757,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 4,
         "st_snap_pct": 0.17,
-        "team_off_snaps": 62,
-        "team_def_snaps": 59,
-        "team_st_snaps": 23,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 2,
-        "game_type": "REG",
-        "game_id": "2026_02_JAX_DEN",
-        "pfr_game_id": "202609200den",
-        "full_name": "Lil'Jordan Humphrey",
-        "normalized_name": "lil jordan humphrey",
-        "pfr_player_id": "HumpLi01",
-        "source_position": "WR",
-        "team": "DEN",
-        "opponent": "JAX",
-        "off_snaps": 3,
-        "off_snap_pct": 0.05,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 0,
-        "st_snap_pct": 0.0,
         "team_off_snaps": 62,
         "team_def_snaps": 59,
         "team_st_snaps": 23,
