@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-06T20:14:42.221865+00:00",
+  "generated_at": "2026-10-07T00:39:28.528348+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 5,
@@ -15,7 +15,7 @@
       5
     ],
     "published_week_count": 4,
-    "published_player_week_records": 4714,
+    "published_player_week_records": 4715,
     "fetch_errors": [
       "week 5: no snap rows available; existing history preserved"
     ]
@@ -64689,6 +64689,33 @@
         "primary_unit": "DEF",
         "primary_snaps": 18,
         "primary_snap_pct": 0.21,
+        "source": "nflverse/PFR"
+      },
+      "10942": {
+        "season": 2026,
+        "week": 3,
+        "game_type": "REG",
+        "game_id": "2026_03_ARI_SF",
+        "pfr_game_id": "202609270sfo",
+        "full_name": "Viliami Fehoko",
+        "pfr_player_id": "FehoVi00",
+        "source_position": "DL",
+        "team": "SF",
+        "opponent": "ARI",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 13,
+        "def_snap_pct": 0.15,
+        "st_snaps": 0,
+        "st_snap_pct": 0.0,
+        "team_off_snaps": 54,
+        "team_def_snaps": 87,
+        "team_st_snaps": 32,
+        "player_id": "10942",
+        "match_quality": "Exact",
+        "primary_unit": "DEF",
+        "primary_snaps": 13,
+        "primary_snap_pct": 0.15,
         "source": "nflverse/PFR"
       },
       "6612": {
@@ -142407,6 +142434,16 @@
         4
       ]
     },
+    "10942": {
+      "player_id": "10942",
+      "latest_snap_week": 3,
+      "latest_primary_snaps": 13,
+      "latest_primary_snap_pct": 0.15,
+      "last3_primary_snap_pct": 0.15,
+      "last3_weeks": [
+        3
+      ]
+    },
     "10932": {
       "player_id": "10932",
       "latest_snap_week": 4,
@@ -158883,30 +158920,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 6,
         "st_snap_pct": 0.19,
-        "team_off_snaps": 54,
-        "team_def_snaps": 87,
-        "team_st_snaps": 32,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 3,
-        "game_type": "REG",
-        "game_id": "2026_03_ARI_SF",
-        "pfr_game_id": "202609270sfo",
-        "full_name": "Viliami Fehoko",
-        "normalized_name": "viliami fehoko",
-        "pfr_player_id": "FehoVi00",
-        "source_position": "DL",
-        "team": "SF",
-        "opponent": "ARI",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 13,
-        "def_snap_pct": 0.15,
-        "st_snaps": 0,
-        "st_snap_pct": 0.0,
         "team_off_snaps": 54,
         "team_def_snaps": 87,
         "team_st_snaps": 32,
