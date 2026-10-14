@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-14T19:20:08.104437+00:00",
+  "generated_at": "2026-10-14T23:53:52.311609+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 6,
@@ -15,7 +15,7 @@
       6
     ],
     "published_week_count": 5,
-    "published_player_week_records": 5808,
+    "published_player_week_records": 5810,
     "fetch_errors": [
       "week 6: no snap rows available; existing history preserved"
     ]
@@ -97768,6 +97768,33 @@
         "primary_snap_pct": 0.26,
         "source": "nflverse/PFR"
       },
+      "8200": {
+        "season": 2026,
+        "week": 4,
+        "game_type": "REG",
+        "game_id": "2026_04_ATL_NO",
+        "pfr_game_id": "202610050nor",
+        "full_name": "Kevin Austin",
+        "pfr_player_id": "AustKe00",
+        "source_position": "WR",
+        "team": "NO",
+        "opponent": "ATL",
+        "off_snaps": 9,
+        "off_snap_pct": 0.12,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 8,
+        "st_snap_pct": 0.26,
+        "team_off_snaps": 74,
+        "team_def_snaps": 57,
+        "team_st_snaps": 31,
+        "player_id": "8200",
+        "match_quality": "Exact",
+        "primary_unit": "OFF",
+        "primary_snaps": 9,
+        "primary_snap_pct": 0.12,
+        "source": "nflverse/PFR"
+      },
       "12079": {
         "season": 2026,
         "week": 4,
@@ -130600,6 +130627,33 @@
         "primary_unit": "DEF",
         "primary_snaps": 37,
         "primary_snap_pct": 0.45,
+        "source": "nflverse/PFR"
+      },
+      "11455": {
+        "season": 2026,
+        "week": 5,
+        "game_type": "REG",
+        "game_id": "2026_05_BUF_LA",
+        "pfr_game_id": "202610120ram",
+        "full_name": "Anthony Kendall",
+        "pfr_player_id": "KendAn00",
+        "source_position": "CB",
+        "team": "BUF",
+        "opponent": "LA",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 31,
+        "def_snap_pct": 0.38,
+        "st_snaps": 15,
+        "st_snap_pct": 0.52,
+        "team_off_snaps": 64,
+        "team_def_snaps": 82,
+        "team_st_snaps": 29,
+        "player_id": "11455",
+        "match_quality": "Exact",
+        "primary_unit": "DEF",
+        "primary_snaps": 31,
+        "primary_snap_pct": 0.38,
         "source": "nflverse/PFR"
       },
       "7342": {
@@ -167119,13 +167173,14 @@
     },
     "8200": {
       "player_id": "8200",
-      "latest_snap_week": 2,
-      "latest_primary_snaps": 5,
-      "latest_primary_snap_pct": 0.07,
-      "last3_primary_snap_pct": 0.065,
+      "latest_snap_week": 4,
+      "latest_primary_snaps": 9,
+      "latest_primary_snap_pct": 0.12,
+      "last3_primary_snap_pct": 0.083333,
       "last3_weeks": [
         1,
-        2
+        2,
+        4
       ]
     },
     "5036": {
@@ -173271,6 +173326,16 @@
       "latest_primary_snaps": 51,
       "latest_primary_snap_pct": 0.62,
       "last3_primary_snap_pct": 0.62,
+      "last3_weeks": [
+        5
+      ]
+    },
+    "11455": {
+      "player_id": "11455",
+      "latest_snap_week": 5,
+      "latest_primary_snaps": 31,
+      "latest_primary_snap_pct": 0.38,
+      "last3_primary_snap_pct": 0.38,
       "last3_weeks": [
         5
       ]
@@ -197216,30 +197281,6 @@
         "game_type": "REG",
         "game_id": "2026_04_ATL_NO",
         "pfr_game_id": "202610050nor",
-        "full_name": "Kevin Austin",
-        "normalized_name": "kevin austin",
-        "pfr_player_id": "AustKe00",
-        "source_position": "WR",
-        "team": "NO",
-        "opponent": "ATL",
-        "off_snaps": 9,
-        "off_snap_pct": 0.12,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 8,
-        "st_snap_pct": 0.26,
-        "team_off_snaps": 74,
-        "team_def_snaps": 57,
-        "team_st_snaps": 31,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 4,
-        "game_type": "REG",
-        "game_id": "2026_04_ATL_NO",
-        "pfr_game_id": "202610050nor",
         "full_name": "William Sherman",
         "normalized_name": "william sherman",
         "pfr_player_id": "SherWi01",
@@ -205102,30 +205143,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 2,
         "st_snap_pct": 0.07,
-        "team_off_snaps": 64,
-        "team_def_snaps": 82,
-        "team_st_snaps": 29,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 5,
-        "game_type": "REG",
-        "game_id": "2026_05_BUF_LA",
-        "pfr_game_id": "202610120ram",
-        "full_name": "Anthony Kendall",
-        "normalized_name": "anthony kendall",
-        "pfr_player_id": "KendAn00",
-        "source_position": "CB",
-        "team": "BUF",
-        "opponent": "LA",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 31,
-        "def_snap_pct": 0.38,
-        "st_snaps": 15,
-        "st_snap_pct": 0.52,
         "team_off_snaps": 64,
         "team_def_snaps": 82,
         "team_st_snaps": 29,
