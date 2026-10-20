@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-20T19:11:44.455735+00:00",
+  "generated_at": "2026-10-20T23:50:32.439808+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 7,
@@ -15,7 +15,7 @@
       7
     ],
     "published_week_count": 6,
-    "published_player_week_records": 6838,
+    "published_player_week_records": 6839,
     "fetch_errors": [
       "week 7: no snap rows available; existing history preserved"
     ]
@@ -141753,6 +141753,33 @@
         "primary_snap_pct": 0.0,
         "source": "nflverse/PFR"
       },
+      "11019": {
+        "season": 2026,
+        "week": 5,
+        "game_type": "REG",
+        "game_id": "2026_05_HOU_TEN",
+        "pfr_game_id": "202610110oti",
+        "full_name": "Erick Hallett",
+        "pfr_player_id": "HallEr00",
+        "source_position": "S",
+        "team": "TEN",
+        "opponent": "HOU",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 21,
+        "st_snap_pct": 0.95,
+        "team_off_snaps": 63,
+        "team_def_snaps": 66,
+        "team_st_snaps": 22,
+        "player_id": "11019",
+        "match_quality": "Exact",
+        "primary_unit": "DEF",
+        "primary_snaps": 0,
+        "primary_snap_pct": 0.0,
+        "source": "nflverse/PFR"
+      },
       "11847": {
         "season": 2026,
         "week": 5,
@@ -195634,14 +195661,14 @@
     },
     "11019": {
       "player_id": "11019",
-      "latest_snap_week": 3,
+      "latest_snap_week": 5,
       "latest_primary_snaps": 0,
       "latest_primary_snap_pct": 0.0,
       "last3_primary_snap_pct": 0.046667,
       "last3_weeks": [
-        1,
         2,
-        3
+        3,
+        5
       ]
     },
     "12357": {
@@ -236050,30 +236077,6 @@
         "def_snap_pct": 0.33,
         "st_snaps": 5,
         "st_snap_pct": 0.23,
-        "team_off_snaps": 63,
-        "team_def_snaps": 66,
-        "team_st_snaps": 22,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 5,
-        "game_type": "REG",
-        "game_id": "2026_05_HOU_TEN",
-        "pfr_game_id": "202610110oti",
-        "full_name": "Erick Hallett",
-        "normalized_name": "erick hallett",
-        "pfr_player_id": "HallEr00",
-        "source_position": "S",
-        "team": "TEN",
-        "opponent": "HOU",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 21,
-        "st_snap_pct": 0.95,
         "team_off_snaps": 63,
         "team_def_snaps": 66,
         "team_st_snaps": 22,
