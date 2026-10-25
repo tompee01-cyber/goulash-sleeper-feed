@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-25T16:09:36.029493+00:00",
+  "generated_at": "2026-10-25T20:46:36.512338+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 7,
@@ -15,7 +15,7 @@
       7
     ],
     "published_week_count": 7,
-    "published_player_week_records": 6901,
+    "published_player_week_records": 6900,
     "fetch_errors": []
   },
   "weekly_snaps": {
@@ -139591,33 +139591,6 @@
         "primary_snap_pct": 0.36,
         "source": "nflverse/PFR"
       },
-      "13672": {
-        "season": 2026,
-        "week": 5,
-        "game_type": "REG",
-        "game_id": "2026_05_DET_ARI",
-        "pfr_game_id": "202610110crd",
-        "full_name": "Wydett Williams",
-        "pfr_player_id": "WillWy00",
-        "source_position": "S",
-        "team": "ARI",
-        "opponent": "DET",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 21,
-        "def_snap_pct": 0.32,
-        "st_snaps": 0,
-        "st_snap_pct": 0.0,
-        "team_off_snaps": 73,
-        "team_def_snaps": 66,
-        "team_st_snaps": 32,
-        "player_id": "13672",
-        "match_quality": "NameTeam",
-        "primary_unit": "DEF",
-        "primary_snaps": 21,
-        "primary_snap_pct": 0.32,
-        "source": "nflverse/PFR"
-      },
       "11336": {
         "season": 2026,
         "week": 5,
@@ -187235,14 +187208,14 @@
     },
     "13672": {
       "player_id": "13672",
-      "latest_snap_week": 5,
-      "latest_primary_snaps": 21,
-      "latest_primary_snap_pct": 0.32,
-      "last3_primary_snap_pct": 0.5,
+      "latest_snap_week": 4,
+      "latest_primary_snaps": 64,
+      "latest_primary_snap_pct": 0.96,
+      "last3_primary_snap_pct": 0.413333,
       "last3_weeks": [
+        2,
         3,
-        4,
-        5
+        4
       ]
     },
     "96": {
@@ -237356,6 +237329,30 @@
         "def_snap_pct": 0.0,
         "st_snaps": 4,
         "st_snap_pct": 0.12,
+        "team_off_snaps": 73,
+        "team_def_snaps": 66,
+        "team_st_snaps": 32,
+        "player_id": null,
+        "match_quality": "Unmatched"
+      },
+      {
+        "season": 2026,
+        "week": 5,
+        "game_type": "REG",
+        "game_id": "2026_05_DET_ARI",
+        "pfr_game_id": "202610110crd",
+        "full_name": "Wydett Williams",
+        "normalized_name": "wydett williams",
+        "pfr_player_id": "WillWy00",
+        "source_position": "S",
+        "team": "ARI",
+        "opponent": "DET",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 21,
+        "def_snap_pct": 0.32,
+        "st_snaps": 0,
+        "st_snap_pct": 0.0,
         "team_off_snaps": 73,
         "team_def_snaps": 66,
         "team_st_snaps": 32,
