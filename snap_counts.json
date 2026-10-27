@@ -1,22 +1,24 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-27T00:23:52.235775+00:00",
+  "generated_at": "2026-10-27T08:54:14.100851+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
-  "current_week": 7,
+  "current_week": 8,
   "snap_status": {
     "fetch_ok": true,
     "source": "nflverse/PFR",
     "source_url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2026.csv",
     "id_crosswalk_source_url": "https://raw.githubusercontent.com/dynastyprocess/data/master/files/db_playerids.csv",
     "weeks_refreshed": [
-      5,
       6,
-      7
+      7,
+      8
     ],
     "published_week_count": 7,
     "published_player_week_records": 7790,
-    "fetch_errors": []
+    "fetch_errors": [
+      "week 8: no snap rows available; existing history preserved"
+    ]
   },
   "weekly_snaps": {
     "1": {
