@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-28T20:14:39.985533+00:00",
+  "generated_at": "2026-10-29T00:52:29.183934+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 8,
@@ -15,7 +15,7 @@
       8
     ],
     "published_week_count": 7,
-    "published_player_week_records": 7860,
+    "published_player_week_records": 7862,
     "fetch_errors": [
       "week 8: no snap rows available; existing history preserved"
     ]
@@ -161357,6 +161357,33 @@
         "primary_snap_pct": 0.28,
         "source": "nflverse/PFR"
       },
+      "11827": {
+        "season": 2026,
+        "week": 6,
+        "game_type": "REG",
+        "game_id": "2026_06_BUF_LV",
+        "pfr_game_id": "202610180rai",
+        "full_name": "Jonah Laulu",
+        "pfr_player_id": "LaulJo00",
+        "source_position": "DT",
+        "team": "LV",
+        "opponent": "BUF",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 18,
+        "def_snap_pct": 0.26,
+        "st_snaps": 7,
+        "st_snap_pct": 0.22,
+        "team_off_snaps": 66,
+        "team_def_snaps": 68,
+        "team_st_snaps": 32,
+        "player_id": "11827",
+        "match_quality": "Exact",
+        "primary_unit": "DEF",
+        "primary_snaps": 18,
+        "primary_snap_pct": 0.26,
+        "source": "nflverse/PFR"
+      },
       "11761": {
         "season": 2026,
         "week": 6,
@@ -165297,6 +165324,33 @@
         "primary_unit": "DEF",
         "primary_snaps": 25,
         "primary_snap_pct": 0.32,
+        "source": "nflverse/PFR"
+      },
+      "11721": {
+        "season": 2026,
+        "week": 6,
+        "game_type": "REG",
+        "game_id": "2026_06_CHI_ATL",
+        "pfr_game_id": "202610180atl",
+        "full_name": "Bralen Trice",
+        "pfr_player_id": "TricBr00",
+        "source_position": "DE",
+        "team": "ATL",
+        "opponent": "CHI",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 21,
+        "def_snap_pct": 0.27,
+        "st_snaps": 0,
+        "st_snap_pct": 0.0,
+        "team_off_snaps": 55,
+        "team_def_snaps": 77,
+        "team_st_snaps": 28,
+        "player_id": "11721",
+        "match_quality": "Exact",
+        "primary_unit": "DEF",
+        "primary_snaps": 21,
+        "primary_snap_pct": 0.27,
         "source": "nflverse/PFR"
       },
       "13048": {
@@ -213933,13 +213987,14 @@
     },
     "11721": {
       "player_id": "11721",
-      "latest_snap_week": 3,
+      "latest_snap_week": 6,
       "latest_primary_snaps": 21,
-      "latest_primary_snap_pct": 0.32,
-      "last3_primary_snap_pct": 0.265,
+      "latest_primary_snap_pct": 0.27,
+      "last3_primary_snap_pct": 0.266667,
       "last3_weeks": [
         1,
-        3
+        3,
+        6
       ]
     },
     "5351": {
@@ -220572,14 +220627,14 @@
     },
     "11827": {
       "player_id": "11827",
-      "latest_snap_week": 5,
-      "latest_primary_snaps": 32,
-      "latest_primary_snap_pct": 0.43,
-      "last3_primary_snap_pct": 0.336667,
+      "latest_snap_week": 6,
+      "latest_primary_snaps": 18,
+      "latest_primary_snap_pct": 0.26,
+      "last3_primary_snap_pct": 0.296667,
       "last3_weeks": [
-        2,
         3,
-        5
+        5,
+        6
       ]
     },
     "13508": {
@@ -268872,30 +268927,6 @@
         "game_type": "REG",
         "game_id": "2026_06_BUF_LV",
         "pfr_game_id": "202610180rai",
-        "full_name": "Jonah Laulu",
-        "normalized_name": "jonah laulu",
-        "pfr_player_id": "LaulJo00",
-        "source_position": "DT",
-        "team": "LV",
-        "opponent": "BUF",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 18,
-        "def_snap_pct": 0.26,
-        "st_snaps": 7,
-        "st_snap_pct": 0.22,
-        "team_off_snaps": 66,
-        "team_def_snaps": 68,
-        "team_st_snaps": 32,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 6,
-        "game_type": "REG",
-        "game_id": "2026_06_BUF_LV",
-        "pfr_game_id": "202610180rai",
         "full_name": "Alex Ward",
         "normalized_name": "alex ward",
         "pfr_player_id": "WardAl00",
@@ -269818,30 +269849,6 @@
         "off_snap_pct": 1.0,
         "def_snaps": 0,
         "def_snap_pct": 0.0,
-        "st_snaps": 0,
-        "st_snap_pct": 0.0,
-        "team_off_snaps": 55,
-        "team_def_snaps": 77,
-        "team_st_snaps": 28,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 6,
-        "game_type": "REG",
-        "game_id": "2026_06_CHI_ATL",
-        "pfr_game_id": "202610180atl",
-        "full_name": "Bralen Trice",
-        "normalized_name": "bralen trice",
-        "pfr_player_id": "TricBr00",
-        "source_position": "DE",
-        "team": "ATL",
-        "opponent": "CHI",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 21,
-        "def_snap_pct": 0.27,
         "st_snaps": 0,
         "st_snap_pct": 0.0,
         "team_off_snaps": 55,
