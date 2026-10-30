@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-30T00:55:42.230701+00:00",
+  "generated_at": "2026-10-30T09:55:40.206178+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 8,
@@ -191161,7 +191161,7 @@
         "team_def_snaps": 61,
         "team_st_snaps": 31,
         "player_id": "13094",
-        "match_quality": "NameTeam",
+        "match_quality": "Exact",
         "primary_unit": "DEF",
         "primary_snaps": 10,
         "primary_snap_pct": 0.16,
