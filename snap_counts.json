@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-10-30T17:58:46.974063+00:00",
+  "generated_at": "2026-10-30T22:14:50.630200+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 8,
@@ -15,7 +15,7 @@
       8
     ],
     "published_week_count": 8,
-    "published_player_week_records": 7931,
+    "published_player_week_records": 7932,
     "fetch_errors": []
   },
   "weekly_snaps": {
@@ -168429,6 +168429,33 @@
         "primary_snap_pct": 0.0,
         "source": "nflverse/PFR"
       },
+      "11769": {
+        "season": 2026,
+        "week": 6,
+        "game_type": "REG",
+        "game_id": "2026_06_DAL_GB",
+        "pfr_game_id": "202610180gnb",
+        "full_name": "Caelen Carson",
+        "pfr_player_id": "CarsCa01",
+        "source_position": "CB",
+        "team": "DAL",
+        "opponent": "GB",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 5,
+        "st_snap_pct": 0.24,
+        "team_off_snaps": 78,
+        "team_def_snaps": 75,
+        "team_st_snaps": 21,
+        "player_id": "11769",
+        "match_quality": "Exact",
+        "primary_unit": "DEF",
+        "primary_snaps": 0,
+        "primary_snap_pct": 0.0,
+        "source": "nflverse/PFR"
+      },
       "11533": {
         "season": 2026,
         "week": 6,
@@ -229441,12 +229468,13 @@
     },
     "11769": {
       "player_id": "11769",
-      "latest_snap_week": 3,
-      "latest_primary_snaps": 17,
-      "latest_primary_snap_pct": 0.27,
-      "last3_primary_snap_pct": 0.27,
+      "latest_snap_week": 6,
+      "latest_primary_snaps": 0,
+      "latest_primary_snap_pct": 0.0,
+      "last3_primary_snap_pct": 0.135,
       "last3_weeks": [
-        3
+        3,
+        6
       ]
     },
     "12037": {
@@ -272490,30 +272518,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 0,
         "st_snap_pct": 0.0,
-        "team_off_snaps": 78,
-        "team_def_snaps": 75,
-        "team_st_snaps": 21,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 6,
-        "game_type": "REG",
-        "game_id": "2026_06_DAL_GB",
-        "pfr_game_id": "202610180gnb",
-        "full_name": "Caelen Carson",
-        "normalized_name": "caelen carson",
-        "pfr_player_id": "CarsCa01",
-        "source_position": "CB",
-        "team": "DAL",
-        "opponent": "GB",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 5,
-        "st_snap_pct": 0.24,
         "team_off_snaps": 78,
         "team_def_snaps": 75,
         "team_st_snaps": 21,
