@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-11-09T19:45:08.772941+00:00",
+  "generated_at": "2026-11-10T03:30:26.361628+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 9,
@@ -15,7 +15,7 @@
       9
     ],
     "published_week_count": 9,
-    "published_player_week_records": 9926,
+    "published_player_week_records": 9927,
     "fetch_errors": []
   },
   "weekly_snaps": {
@@ -197240,6 +197240,33 @@
         "primary_snap_pct": 0.0,
         "source": "nflverse/PFR"
       },
+      "12054": {
+        "season": 2026,
+        "week": 7,
+        "game_type": "REG",
+        "game_id": "2026_07_KC_SEA",
+        "pfr_game_id": "202610250sea",
+        "full_name": "Jimmy Ciarlo",
+        "pfr_player_id": "CiarJi00",
+        "source_position": "LB",
+        "team": "SEA",
+        "opponent": "KC",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 11,
+        "st_snap_pct": 0.58,
+        "team_off_snaps": 69,
+        "team_def_snaps": 53,
+        "team_st_snaps": 19,
+        "player_id": "12054",
+        "match_quality": "Exact",
+        "primary_unit": "DEF",
+        "primary_snaps": 0,
+        "primary_snap_pct": 0.0,
+        "source": "nflverse/PFR"
+      },
       "2747": {
         "season": 2026,
         "week": 7,
@@ -285546,12 +285573,13 @@
     },
     "12054": {
       "player_id": "12054",
-      "latest_snap_week": 6,
+      "latest_snap_week": 7,
       "latest_primary_snaps": 0,
       "latest_primary_snap_pct": 0.0,
       "last3_primary_snap_pct": 0.0,
       "last3_weeks": [
-        6
+        6,
+        7
       ]
     },
     "8861": {
@@ -333953,30 +333981,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 0,
         "st_snap_pct": 0.0,
-        "team_off_snaps": 69,
-        "team_def_snaps": 53,
-        "team_st_snaps": 19,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 7,
-        "game_type": "REG",
-        "game_id": "2026_07_KC_SEA",
-        "pfr_game_id": "202610250sea",
-        "full_name": "Jimmy Ciarlo",
-        "normalized_name": "jimmy ciarlo",
-        "pfr_player_id": "CiarJi00",
-        "source_position": "LB",
-        "team": "SEA",
-        "opponent": "KC",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 11,
-        "st_snap_pct": 0.58,
         "team_off_snaps": 69,
         "team_def_snaps": 53,
         "team_st_snaps": 19,
