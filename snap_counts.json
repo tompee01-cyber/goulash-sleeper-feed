@@ -1,22 +1,24 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-11-16T21:57:03.695502+00:00",
+  "generated_at": "2026-11-17T07:49:17.280833+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
-  "current_week": 10,
+  "current_week": 11,
   "snap_status": {
     "fetch_ok": true,
     "source": "nflverse/PFR",
     "source_url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2026.csv",
     "id_crosswalk_source_url": "https://raw.githubusercontent.com/dynastyprocess/data/master/files/db_playerids.csv",
     "weeks_refreshed": [
-      8,
       9,
-      10
+      10,
+      11
     ],
     "published_week_count": 10,
-    "published_player_week_records": 10959,
-    "fetch_errors": []
+    "published_player_week_records": 10960,
+    "fetch_errors": [
+      "week 11: no snap rows available; existing history preserved"
+    ]
   },
   "weekly_snaps": {
     "1": {
@@ -256293,6 +256295,33 @@
         "primary_snap_pct": 0.21,
         "source": "nflverse/PFR"
       },
+      "12389": {
+        "season": 2026,
+        "week": 9,
+        "game_type": "REG",
+        "game_id": "2026_09_HOU_LAC",
+        "pfr_game_id": "202611080sdg",
+        "full_name": "Hayden Rucci",
+        "pfr_player_id": "RuccHa00",
+        "source_position": "TE",
+        "team": "LAC",
+        "opponent": "HOU",
+        "off_snaps": 11,
+        "off_snap_pct": 0.15,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 15,
+        "st_snap_pct": 0.44,
+        "team_off_snaps": 72,
+        "team_def_snaps": 70,
+        "team_st_snaps": 33,
+        "player_id": "12389",
+        "match_quality": "Exact",
+        "primary_unit": "OFF",
+        "primary_snaps": 11,
+        "primary_snap_pct": 0.15,
+        "source": "nflverse/PFR"
+      },
       "10234": {
         "season": 2026,
         "week": 9,
@@ -311499,14 +311528,14 @@
     },
     "12389": {
       "player_id": "12389",
-      "latest_snap_week": 6,
-      "latest_primary_snaps": 9,
-      "latest_primary_snap_pct": 0.13,
-      "last3_primary_snap_pct": 0.266667,
+      "latest_snap_week": 9,
+      "latest_primary_snaps": 11,
+      "latest_primary_snap_pct": 0.15,
+      "last3_primary_snap_pct": 0.153333,
       "last3_weeks": [
-        4,
         5,
-        6
+        6,
+        9
       ]
     },
     "5086": {
@@ -376419,30 +376448,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 1,
         "st_snap_pct": 0.03,
-        "team_off_snaps": 72,
-        "team_def_snaps": 70,
-        "team_st_snaps": 33,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 9,
-        "game_type": "REG",
-        "game_id": "2026_09_HOU_LAC",
-        "pfr_game_id": "202611080sdg",
-        "full_name": "Hayden Rucci",
-        "normalized_name": "hayden rucci",
-        "pfr_player_id": "RuccHa00",
-        "source_position": "TE",
-        "team": "LAC",
-        "opponent": "HOU",
-        "off_snaps": 11,
-        "off_snap_pct": 0.15,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 15,
-        "st_snap_pct": 0.44,
         "team_off_snaps": 72,
         "team_def_snaps": 70,
         "team_st_snaps": 33,
