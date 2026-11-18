@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-11-17T18:30:18.826180+00:00",
+  "generated_at": "2026-11-18T02:52:36.497280+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 11,
@@ -15,7 +15,7 @@
       11
     ],
     "published_week_count": 10,
-    "published_player_week_records": 11022,
+    "published_player_week_records": 11025,
     "fetch_errors": [
       "week 11: no snap rows available; existing history preserved"
     ]
@@ -243956,6 +243956,33 @@
         "primary_snap_pct": 0.0,
         "source": "nflverse/PFR"
       },
+      "12380": {
+        "season": 2026,
+        "week": 9,
+        "game_type": "REG",
+        "game_id": "2026_09_BUF_MIN",
+        "pfr_game_id": "202611090min",
+        "full_name": "Te'Cory Couch",
+        "pfr_player_id": "CoucTe00",
+        "source_position": "DB",
+        "team": "BUF",
+        "opponent": "MIN",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 13,
+        "st_snap_pct": 0.5,
+        "team_off_snaps": 80,
+        "team_def_snaps": 48,
+        "team_st_snaps": 26,
+        "player_id": "12380",
+        "match_quality": "NameTeam",
+        "primary_unit": "DEF",
+        "primary_snaps": 0,
+        "primary_snap_pct": 0.0,
+        "source": "nflverse/PFR"
+      },
       "7042": {
         "season": 2026,
         "week": 9,
@@ -255186,6 +255213,33 @@
         "primary_unit": "OFF",
         "primary_snaps": 10,
         "primary_snap_pct": 0.15,
+        "source": "nflverse/PFR"
+      },
+      "12829": {
+        "season": 2026,
+        "week": 9,
+        "game_type": "REG",
+        "game_id": "2026_09_GB_NE",
+        "pfr_game_id": "202611080nwe",
+        "full_name": "Coleman Owen",
+        "pfr_player_id": "OwenCo00",
+        "source_position": "WR",
+        "team": "GB",
+        "opponent": "NE",
+        "off_snaps": 8,
+        "off_snap_pct": 0.12,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 6,
+        "st_snap_pct": 0.18,
+        "team_off_snaps": 66,
+        "team_def_snaps": 63,
+        "team_st_snaps": 33,
+        "player_id": "12829",
+        "match_quality": "Exact",
+        "primary_unit": "OFF",
+        "primary_snaps": 8,
+        "primary_snap_pct": 0.12,
         "source": "nflverse/PFR"
       },
       "827": {
@@ -282971,6 +283025,33 @@
         "primary_unit": "OFF",
         "primary_snaps": 4,
         "primary_snap_pct": 0.05,
+        "source": "nflverse/PFR"
+      },
+      "13011": {
+        "season": 2026,
+        "week": 10,
+        "game_type": "REG",
+        "game_id": "2026_10_LA_ARI",
+        "pfr_game_id": "202611150crd",
+        "full_name": "Brennan Presley",
+        "pfr_player_id": "PresBr00",
+        "source_position": "WR",
+        "team": "LA",
+        "opponent": "ARI",
+        "off_snaps": 2,
+        "off_snap_pct": 0.03,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 3,
+        "st_snap_pct": 0.14,
+        "team_off_snaps": 76,
+        "team_def_snaps": 35,
+        "team_st_snaps": 22,
+        "player_id": "13011",
+        "match_quality": "Exact",
+        "primary_unit": "OFF",
+        "primary_snaps": 2,
+        "primary_snap_pct": 0.03,
         "source": "nflverse/PFR"
       },
       "8330": {
@@ -313192,13 +313273,14 @@
     },
     "12380": {
       "player_id": "12380",
-      "latest_snap_week": 4,
+      "latest_snap_week": 9,
       "latest_primary_snaps": 0,
       "latest_primary_snap_pct": 0.0,
       "last3_primary_snap_pct": 0.0,
       "last3_weeks": [
         3,
-        4
+        4,
+        9
       ]
     },
     "12389": {
@@ -315031,13 +315113,14 @@
     },
     "12829": {
       "player_id": "12829",
-      "latest_snap_week": 7,
-      "latest_primary_snaps": 0,
-      "latest_primary_snap_pct": 0.0,
-      "last3_primary_snap_pct": 0.0,
+      "latest_snap_week": 9,
+      "latest_primary_snaps": 8,
+      "latest_primary_snap_pct": 0.12,
+      "last3_primary_snap_pct": 0.04,
       "last3_weeks": [
         6,
-        7
+        7,
+        9
       ]
     },
     "8271": {
@@ -316419,6 +316502,16 @@
       "latest_primary_snaps": 7,
       "latest_primary_snap_pct": 0.2,
       "last3_primary_snap_pct": 0.2,
+      "last3_weeks": [
+        10
+      ]
+    },
+    "13011": {
+      "player_id": "13011",
+      "latest_snap_week": 10,
+      "latest_primary_snaps": 2,
+      "latest_primary_snap_pct": 0.03,
+      "last3_primary_snap_pct": 0.03,
       "last3_weeks": [
         10
       ]
@@ -375146,30 +375239,6 @@
         "game_type": "REG",
         "game_id": "2026_09_BUF_MIN",
         "pfr_game_id": "202611090min",
-        "full_name": "Te'Cory Couch",
-        "normalized_name": "te cory couch",
-        "pfr_player_id": "CoucTe00",
-        "source_position": "DB",
-        "team": "BUF",
-        "opponent": "MIN",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 13,
-        "st_snap_pct": 0.5,
-        "team_off_snaps": 80,
-        "team_def_snaps": 48,
-        "team_st_snaps": 26,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 9,
-        "game_type": "REG",
-        "game_id": "2026_09_BUF_MIN",
-        "pfr_game_id": "202611090min",
         "full_name": "Reid Ferguson",
         "normalized_name": "reid ferguson",
         "pfr_player_id": "FergRe00",
@@ -377966,30 +378035,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 7,
         "st_snap_pct": 0.21,
-        "team_off_snaps": 66,
-        "team_def_snaps": 63,
-        "team_st_snaps": 33,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 9,
-        "game_type": "REG",
-        "game_id": "2026_09_GB_NE",
-        "pfr_game_id": "202611080nwe",
-        "full_name": "Coleman Owen",
-        "normalized_name": "coleman owen",
-        "pfr_player_id": "OwenCo00",
-        "source_position": "WR",
-        "team": "GB",
-        "opponent": "NE",
-        "off_snaps": 8,
-        "off_snap_pct": 0.12,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 6,
-        "st_snap_pct": 0.18,
         "team_off_snaps": 66,
         "team_def_snaps": 63,
         "team_st_snaps": 33,
@@ -384736,30 +384781,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 6,
         "st_snap_pct": 0.27,
-        "team_off_snaps": 76,
-        "team_def_snaps": 35,
-        "team_st_snaps": 22,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 10,
-        "game_type": "REG",
-        "game_id": "2026_10_LA_ARI",
-        "pfr_game_id": "202611150crd",
-        "full_name": "Brennan Presley",
-        "normalized_name": "brennan presley",
-        "pfr_player_id": "PresBr00",
-        "source_position": "WR",
-        "team": "LA",
-        "opponent": "ARI",
-        "off_snaps": 2,
-        "off_snap_pct": 0.03,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 3,
-        "st_snap_pct": 0.14,
         "team_off_snaps": 76,
         "team_def_snaps": 35,
         "team_st_snaps": 22,
