@@ -1,6 +1,6 @@
 {
   "schema_version": "GK_SNAPS_V1",
-  "generated_at": "2026-11-24T23:52:00.327791+00:00",
+  "generated_at": "2026-11-25T08:22:44.411181+00:00",
   "league_id": "1382401291862437888",
   "season": "2026",
   "current_week": 12,
@@ -15,7 +15,7 @@
       12
     ],
     "published_week_count": 11,
-    "published_player_week_records": 11989,
+    "published_player_week_records": 11990,
     "fetch_errors": [
       "week 12: no snap rows available; existing history preserved"
     ]
@@ -279760,6 +279760,33 @@
         "primary_snap_pct": 0.36,
         "source": "nflverse/PFR"
       },
+      "13904": {
+        "season": 2026,
+        "week": 10,
+        "game_type": "REG",
+        "game_id": "2026_10_KC_ATL",
+        "pfr_game_id": "202611150atl",
+        "full_name": "Jacob De Jesus",
+        "pfr_player_id": "DeJeJa00",
+        "source_position": "WR",
+        "team": "KC",
+        "opponent": "ATL",
+        "off_snaps": 0,
+        "off_snap_pct": 0.0,
+        "def_snaps": 0,
+        "def_snap_pct": 0.0,
+        "st_snaps": 9,
+        "st_snap_pct": 0.27,
+        "team_off_snaps": 65,
+        "team_def_snaps": 72,
+        "team_st_snaps": 33,
+        "player_id": "13904",
+        "match_quality": "Exact",
+        "primary_unit": "OFF",
+        "primary_snaps": 0,
+        "primary_snap_pct": 0.0,
+        "source": "nflverse/PFR"
+      },
       "3257": {
         "season": 2026,
         "week": 10,
@@ -342527,6 +342554,16 @@
     },
     "13775": {
       "player_id": "13775",
+      "latest_snap_week": 10,
+      "latest_primary_snaps": 0,
+      "latest_primary_snap_pct": 0.0,
+      "last3_primary_snap_pct": 0.0,
+      "last3_weeks": [
+        10
+      ]
+    },
+    "13904": {
+      "player_id": "13904",
       "latest_snap_week": 10,
       "latest_primary_snaps": 0,
       "latest_primary_snap_pct": 0.0,
@@ -410208,30 +410245,6 @@
         "def_snap_pct": 0.0,
         "st_snaps": 13,
         "st_snap_pct": 0.39,
-        "team_off_snaps": 65,
-        "team_def_snaps": 72,
-        "team_st_snaps": 33,
-        "player_id": null,
-        "match_quality": "Unmatched"
-      },
-      {
-        "season": 2026,
-        "week": 10,
-        "game_type": "REG",
-        "game_id": "2026_10_KC_ATL",
-        "pfr_game_id": "202611150atl",
-        "full_name": "Jacob De Jesus",
-        "normalized_name": "jacob de jesus",
-        "pfr_player_id": "DeJeJa00",
-        "source_position": "WR",
-        "team": "KC",
-        "opponent": "ATL",
-        "off_snaps": 0,
-        "off_snap_pct": 0.0,
-        "def_snaps": 0,
-        "def_snap_pct": 0.0,
-        "st_snaps": 9,
-        "st_snap_pct": 0.27,
         "team_off_snaps": 65,
         "team_def_snaps": 72,
         "team_st_snaps": 33,
